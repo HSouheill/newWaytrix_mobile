@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "eye-second-project",
-    "slug": "eye-second-project",
+    "slug": "waytrixapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -39,8 +39,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "bf73de0f-fc1a-4e0c-b2d9-7786abc53ca7"
+        "projectId": "a58edf9d-4f7f-424f-976e-ebe3c74b2b78"
       }
-    }
+    },
+    "owner": "dapss"
   }
 }
