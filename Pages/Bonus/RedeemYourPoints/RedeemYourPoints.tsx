@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import VouchersPage from './Vouchers'
+import VouchersPage from './Vouchers';
 import ipAddress from '../../../config';
-const RedeemYourPoints = () => {
+
+const RedeemYourPoints = ({ navigation }) => {
   const [totalPoints, setTotalPoints] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +30,6 @@ const RedeemYourPoints = () => {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchPoints(); // Initial fetch
@@ -42,7 +42,6 @@ const RedeemYourPoints = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Redeem Your Points</Text> */}
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" />
       ) : (
@@ -54,8 +53,12 @@ const RedeemYourPoints = () => {
         </View>
       )}
 
-<VouchersPage/>
+      <VouchersPage />
 
+      {/* Go Back Button */}
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Go Back</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -65,12 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    color: '#ffffff',
-    textAlign: 'center',
-    marginVertical: 20,
   },
   pointsContainer: {
     flexDirection: 'row',
@@ -97,6 +94,18 @@ const styles = StyleSheet.create({
   pointsText: {
     fontSize: 18,
     color: '#ffffff',
+  },
+  backButton: {
+    backgroundColor: '#ffffff',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: '#121212',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

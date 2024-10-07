@@ -1,28 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ipAddress from '../../../config';
+import { useNavigation } from '@react-navigation/native';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   const handleSignIn = async () => {
-  
-      // if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      //   alert('Please enter a valid email');
-      //   return;
-      // }
-      
-      if (password.trim().length < 8) {
-        alert('Password must be at least 8 characters');
-        return;
-      }
+    if (password.trim().length < 8) {
+      alert('Password must be at least 8 characters');
+      return;
+    }
     const userData = {
       email,
       password,
-      role:"customer"
+      role: "customer"
     };
 
     try {
@@ -30,11 +26,23 @@ const SignIn = () => {
       const { token, _id } = response.data;
       await AsyncStorage.setItem('customerToken', token);
       await AsyncStorage.setItem('customerId', _id);
-
       console.log('Token stored successfully:', token);
+
+      // Start the logout timer
+      setTimeout(async () => {
+        await logoutUser();
+      }, 120000); // 2 minutes in milliseconds
+
     } catch (error) {
       console.error('Error signing in:', error);
     }
+  };
+
+  const logoutUser = async () => {
+    await AsyncStorage.removeItem('customerToken');
+    await AsyncStorage.removeItem('customerId');
+    console.log('User logged out due to inactivity.');
+    //navigation.navigate('SignIn'); // Navigate to the sign-in screen
   };
 
   return (

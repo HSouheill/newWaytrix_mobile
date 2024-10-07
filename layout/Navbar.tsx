@@ -75,7 +75,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
     checkCustomerToken();
     const interval = setInterval(() => {
       checkCustomerToken();
-    }, 30000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
   React.useEffect(() => {

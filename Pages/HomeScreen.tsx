@@ -4,7 +4,7 @@ import { Video } from 'expo-av';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GetRestoId from './GetRestoId';
-import LocalImage from './waytrix.png'; // Import the local image
+//import LocalImage from '../Pages/waytrix.png'; // Import the local image
 import ipAddress from '../config';
 
 export default function HomeScreen({ navigation }) {
@@ -62,7 +62,7 @@ export default function HomeScreen({ navigation }) {
       } else {
         // No media URL received, display the local image
         setIsVideo(false);
-        setMediaURL(LocalImage);
+        setMediaURL(require('../Pages/waytrix.png'));//setMediaURL(LocalImage);
         setTimeout(fetchMedia, 10000); // Fetch new media after 10 seconds
       }
     } catch (error) {
@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }) {
       // In case of an error, display the local image
       //this error appears also when the video for current table has been deleted from the DB
       setIsVideo(false);
-      setMediaURL(LocalImage);
+      setMediaURL(require('../Pages/waytrix.png'));//setMediaURL(LocalImage);
       setTimeout(fetchMedia, 10000); // Retry fetching new media after 10 seconds
     }
   };

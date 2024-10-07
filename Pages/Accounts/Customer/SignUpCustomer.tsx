@@ -11,6 +11,7 @@ const Customer = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState(''); // New state for gender
+  const [age, setAge] = useState(''); //new for age
   const [isSignIn, setIsSignIn] = useState(true);
   const [customerToken, setCustomerToken] = useState(null);
   const [verificationModalVisible, setVerificationModalVisible] = useState(false);
@@ -58,6 +59,10 @@ const Customer = ({ navigation }) => {
       alert('Please select a gender');
       return;
     }
+    if (!age.trim() || isNaN(parseInt(age.trim()))) {
+      alert('Please enter a valid age');
+      return;
+    }
 
     const userData = {
       name,
@@ -65,6 +70,7 @@ const Customer = ({ navigation }) => {
       phone: parseInt(phone),
       password,
       gender, // Add gender to user data
+      age: parseInt(age),
       role: 'customer',
     };
 
@@ -147,6 +153,14 @@ const Customer = ({ navigation }) => {
             style={styles.input}
             placeholderTextColor="#fff"
           />
+          <TextInput
+            placeholder="Age"
+            value={age}
+            onChangeText={setAge}
+            keyboardType="numeric"
+            style={styles.input}
+            placeholderTextColor="#fff"
+          />
           <Text style={styles.label}>Gender:</Text>
           <View style={styles.genderContainer}>
             <TouchableOpacity
@@ -161,12 +175,12 @@ const Customer = ({ navigation }) => {
             >
               <Text style={styles.genderText}>Female</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.genderButton, gender === 'other' && styles.selectedGender]}
               onPress={() => setGender('other')}
             >
               <Text style={styles.genderText}>Other</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <TouchableOpacity onPress={handleSubmit} style={styles.button}>
             <Text style={styles.buttonText}>Submit</Text>
