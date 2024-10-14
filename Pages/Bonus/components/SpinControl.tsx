@@ -39,16 +39,16 @@ const SpinControl: React.FC<SpinControlProps> = ({
           <Stop offset="100%" stopColor="#D89834" stopOpacity="1" />
         </LinearGradient>
       </Defs>
-      <Path d={bowPath} stroke="#F4CB79" strokeWidth={8} fill="none" />
+      <Path d={bowPath} stroke="#FFC300" strokeWidth={8} fill="none" />
       <G>
-        <Path d={daggerPath} stroke="#F4CB79" strokeWidth={6} fill="#F4CB79" />
+        <Path d={daggerPath} stroke="#FFC300" strokeWidth={6} fill="#FFC300" />
         <Circle cx={SCREEN_WIDTH / 2} cy="124" r="55" fill="#B8783C" />
         <AnimatedCircle
           onPress={onSpin}
           cx={SCREEN_WIDTH / 2}
           animatedProps={animatedCircleProps}
           r="55"
-          fill="#FCE2A7"
+          fill="#FFC300" // colors HERE ANDD on lines 42, 44, and 38 and 39 for text
         />
         <SText
           x={SCREEN_WIDTH / 2}

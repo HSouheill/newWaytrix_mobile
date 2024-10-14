@@ -53,7 +53,28 @@ const WheelSegment: React.FC<WheelSegmentProps> = ({
 
   return (
     <G>
-      <AnimatedPath d={segment.pathData} animatedProps={segmentProps} stroke={"black"} />
+      {/* <AnimatedPath d={segment.pathData} animatedProps={segmentProps} stroke={"black"} /> */}
+      {/* Both paths below are purely decorative WHITE GLOW */}
+      <AnimatedPath
+        d={segment.pathData}
+        animatedProps={segmentProps}
+        stroke={"rgba(255, 255, 255, 0.4)"} // Light white for glow
+        strokeWidth={12}                       // Thicker stroke for glow
+      />
+      <AnimatedPath
+        d={segment.pathData}
+        animatedProps={segmentProps}
+        stroke={"rgba(255, 255, 255, 0.4)"} // Light white for glow
+        strokeWidth={18}                       // Thicker stroke for glow
+      />
+        {/* Main White Stroke */}
+      <AnimatedPath
+        d={segment.pathData}
+        animatedProps={segmentProps}
+        stroke={"white"}                     // Actual white stroke
+        strokeWidth={4}                      // Thin stroke width
+      />
+
       <G x={segment.centroid[0]} y={segment.centroid[1]} transform={`rotate(${segment.rotationAngle})`}>
         <SText
           fontSize={22}

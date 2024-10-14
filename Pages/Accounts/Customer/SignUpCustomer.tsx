@@ -10,13 +10,11 @@ const Customer = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [gender, setGender] = useState(''); // New state for gender
-  const [age, setAge] = useState(''); //new for age
+  const [gender, setGender] = useState(''); 
+  const [age, setAge] = useState(''); 
   const [isSignIn, setIsSignIn] = useState(true);
-  const [customerToken, setCustomerToken] = useState(null);
   const [verificationModalVisible, setVerificationModalVisible] = useState(false);
   const [verificationKey, setVerificationKey] = useState('');
-  const [smsKey, setSmsKey] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -69,7 +67,7 @@ const Customer = ({ navigation }) => {
       email,
       phone: parseInt(phone),
       password,
-      gender, // Add gender to user data
+      gender, 
       age: parseInt(age),
       role: 'customer',
     };
@@ -77,36 +75,29 @@ const Customer = ({ navigation }) => {
     axios.post(`${ipAddress}/api/Auth/signup`, userData)
       .then(response => {
         console.log(response.data);
-        setCustomerToken(response.data.token);
         AsyncStorage.setItem('customerId', response.data._id);
         AsyncStorage.setItem('verificationModalVisible', JSON.stringify(true));
-        console.log(customerToken);
       })
       .catch(error => {
         console.error(error);
+        alert('Signup failed: ' + error.response.data);
       });
   };
 
   const handleVerify = () => {
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${customerToken}`
-      }
-    };
     const verificationData = {
+      email,
       verificationKey: parseInt(verificationKey),
-      SmsVerification: parseInt(smsKey)
     };
 
-    axios.post(`${ipAddress}/api/Auth/verifyUser`, verificationData, config)
+    axios.post(`${ipAddress}/api/Auth/verifyUser`, verificationData)
       .then(response => {
-        AsyncStorage.setItem('customerToken', customerToken);
-        console.log(customerToken);
         console.log(response.data);
         setVerificationModalVisible(false);
+        alert('User verified successfully!');
       })
       .catch(error => {
-        alert('email already exist');
+        alert('Verification failed: ' + error.response.data);
         console.error(error);
       });
   };
@@ -175,12 +166,6 @@ const Customer = ({ navigation }) => {
             >
               <Text style={styles.genderText}>Female</Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-              style={[styles.genderButton, gender === 'other' && styles.selectedGender]}
-              onPress={() => setGender('other')}
-            >
-              <Text style={styles.genderText}>Other</Text>
-            </TouchableOpacity> */}
           </View>
           <TouchableOpacity onPress={handleSubmit} style={styles.button}>
             <Text style={styles.buttonText}>Submit</Text>
@@ -209,14 +194,6 @@ const Customer = ({ navigation }) => {
               placeholder="Email Verification Key"
               value={verificationKey}
               onChangeText={setVerificationKey}
-              style={styles.input}
-              placeholderTextColor="#fff"
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="SMS Key"
-              value={smsKey}
-              onChangeText={setSmsKey}
               style={styles.input}
               placeholderTextColor="#fff"
               keyboardType="numeric"

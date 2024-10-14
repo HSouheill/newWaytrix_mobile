@@ -20,23 +20,39 @@ const SignIn = () => {
       password,
       role: "customer"
     };
-
+  
     try {
       const response = await axios.post(`${ipAddress}/api/Auth/login`, userData);
       const { token, _id } = response.data;
+  
+      // Store the customer token and ID
       await AsyncStorage.setItem('customerToken', token);
       await AsyncStorage.setItem('customerId', _id);
       console.log('Token stored successfully:', token);
-
-      // Start the logout timer
+  
+      // Call the API to increment totalTimesSigned
+      await incrementTotalTimesSigned(_id);
+  
+      // Start the logout timer (2 minutes)
       setTimeout(async () => {
         await logoutUser();
-      }, 120000); // 2 minutes in milliseconds
-
+      }, 200000);
+  
     } catch (error) {
       console.error('Error signing in:', error);
     }
   };
+  
+  // Function to increment totalTimesSigned
+  const incrementTotalTimesSigned = async (userId) => {
+    try {
+      const response = await axios.post(`${ipAddress}/api/Auth/incrementTotalTimesSigned`, { userId });
+      console.log('Total times signed incremented:', response.data);
+    } catch (error) {
+      console.error('Error incrementing totalTimesSigned:', error);
+    }
+  };
+  
 
   const logoutUser = async () => {
     await AsyncStorage.removeItem('customerToken');

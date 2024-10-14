@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text,Alert, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity, Modal, Button, TextInput } from 'react-native';
+import { View, Text, Alert, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity, Modal, Button, TextInput } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import ipAddress from '../../../config';
+
 const Vouchers = () => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,39 +13,32 @@ const Vouchers = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [showFormModall, setShowFormModall] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
+  const [selectedVoucherId, setSelectedVoucherId] = useState(null); //NEWWWWWWWWWWWWWWWWWW
 
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const navigation = useNavigation();
-// redeemKey
-const [redeemKey, setRedeemKey] = useState();
-const fetchVouchers = async () => {
-  console.log("hiewufhiuefhiurfhiuerhhiiiiiiiii")
-  console.log("hiewufhiuefhiurfhiuerhhiiiiiiiii")
-  console.log("hiewufhiuefhiurfhiuerhhiiiiiiiii")
-  console.log("hiewufhiuefhiurfhiuerhhiiiiiiiii")
-  console.log("hiewufhiuefhiurfhiuerhhiiiiiiiii")
-  try {
-    const customerToken = await AsyncStorage.getItem('customerToken');
-    const restoId = await AsyncStorage.getItem('restoId');
-console.log(restoId)
-    if (!customerToken) throw new Error('Customer token not found');
+  const [redeemKey, setRedeemKey] = useState();
 
-    const response = await axios.post(`${ipAddress}/api/ContactUsRoutes/GetAllVouchers`, { restoId: restoId }, {
-      headers: {
-        Authorization: customerToken
-      }
-    });
-    console.log(response)
-    
-    setVouchers(response.data);
+  const fetchVouchers = async () => {
+    try {
+      const customerToken = await AsyncStorage.getItem('customerToken');
+      const restoId = await AsyncStorage.getItem('restoId');
+      if (!customerToken) throw new Error('Customer token not found');
 
-  } catch (error) {
-    console.error('Error fetching vouchers:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+      const response = await axios.post(`${ipAddress}/api/ContactUsRoutes/GetAllVouchers`, { restoId: restoId }, {
+        headers: {
+          Authorization: customerToken
+        }
+      });
+
+      setVouchers(response.data);
+    } catch (error) {
+      console.error('Error fetching vouchers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchVouchers();
@@ -57,67 +51,57 @@ console.log(restoId)
       const canRedeemValue = await AsyncStorage.getItem('canRedeem');
       setCanRedeem(canRedeemValue === 'true');
     };
-  
-    // Initial fetch when component mounts
+
     fetchCanRedeem();
-  
-    // Set interval to fetch every one second
     const interval = setInterval(fetchCanRedeem, 1000);
-  
-    // Clean up interval on component unmount
     return () => clearInterval(interval);
   }, []);
-  
 
   const redeemVoucher = async (voucherId, redeemKey) => {
     const customerId = await AsyncStorage.getItem('customerId');
     const restoId = await AsyncStorage.getItem('restoId');
-
     const customerToken = await AsyncStorage.getItem('customerToken');
-    
+
     axios.post(`${ipAddress}/api/ContactUsRoutes/Redeem`, {
-      _id: voucherId,
+      _id: selectedVoucherId, //was voucherId
       customerId: customerId,
-      restoId:restoId,
-      redeemKey: redeemKey // Include redeemKey in the request body
+      restoId: restoId,
+      redeemKey: redeemKey
     }, {
       headers: {
         Authorization: customerToken
       }
     })
-      .then(async response => {
+    .then(async response => {
+      setTimeout(() => {
+        setShowFormModall(false);
+      }, 3000);
+
+      console.log('Voucher redeemed:', response.data);
+      setModalVisible(true);
+      setTimeout(() => {
+        setModalVisible(false);
         setTimeout(() => {
-          setShowFormModall(false);
-        }, 3000);
-  
-        console.log('Voucher redeemed:', response.data);
-        setModalVisible(true);
+          navigation.navigate("Home");
+        }, 1500);
+      }, 5000);
+      await AsyncStorage.removeItem('canRedeem');
+      setCanRedeem(false);
+    })
+    .catch(error => {
+      console.error('Error redeeming voucher:', error);
+      setErrorModal(true);
+      setTimeout(() => {
+        setErrorModal(false);
         setTimeout(() => {
-          setModalVisible(false);
-          setTimeout(() => {
-            navigation.navigate("Home")
-          }, 1500);
-        }, 5000);
-        await AsyncStorage.removeItem('canRedeem'); // Remove the item from AsyncStorage
-        setCanRedeem(false);
-      })
-      .catch(error => {
-        console.error('Error redeeming voucher:', error);
-        setErrorModal(true);
-        setTimeout(() => {
-          setErrorModal(false);
-          setTimeout(() => {
-            navigation.navigate("Home")
-          }, 1500);
-        }, 4000);
-  
-        setTimeout(() => {
-          setShowFormModall(false);
-        }, 2000);
-      });
+          navigation.navigate("Home");
+        }, 1500);
+      }, 4000);
+      setTimeout(() => {
+        setShowFormModall(false);
+      }, 2000);
+    });
   };
-  
-  
 
   const renderVoucherCard = ({ item }) => (
     <View style={styles.card}>
@@ -130,103 +114,100 @@ console.log(restoId)
         <Text style={styles.cardDescription}>{item.description}</Text>
         {canRedeem ? (
           <>
-          <TouchableOpacity
-          style={styles.redeemButton}
-          onPress={() => setShowFormModall(true)}
-        >
-          <Text style={styles.redeemText}>Redeem</Text>
-        </TouchableOpacity>
-        {/* setErrorModal */}
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={errorModal}
-        onRequestClose={() => {
-          setErrorModal(false);
-        }}
-      >
-        <View style={styles.formModalContainer}>
-          <View style={styles.formModalContent}>
-          <Text style={styles.cardText}>Waytrix Team</Text>
-
-            <Text style={styles.cardText}>We Feel sorry to inform you that your voucher is not redeemed</Text>
-           
-          </View>
-        </View>
-      </Modal>
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showFormModall}
-        onRequestClose={() => {
-          setShowFormModall(false);
-        }}
-      >
-        <View style={styles.formModalContainer}>
-          <View style={styles.formModalContent}>
-            <Text style={styles.cardText}>Redeem Key:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Redeem Key"
-              value={redeemKey}
-              onChangeText={setRedeemKey}
-              keyboardType="numeric"
-            />
             <TouchableOpacity
-              style={styles.requestSMSButton}
-              onPress={() => {
-                redeemVoucher(item._id, redeemKey); // Pass redeemKey to redeemVoucher
-                setShowFormModal(false);
+              style={styles.redeemButton}
+              onPress={() => setShowFormModall(true)}
+            >
+              <Text style={styles.redeemText}>Redeem</Text>
+            </TouchableOpacity>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={errorModal}
+              onRequestClose={() => {
+                setErrorModal(false);
               }}
             >
-              <Text style={styles.requestSMSText}>Redeem</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal></>
-      
+              <View style={styles.formModalContainer}>
+                <View style={styles.formModalContent}>
+                  <Text style={styles.cardText}>Waytrix Team</Text>
+                  <Text style={styles.cardText}>We feel sorry to inform you that your voucher is not redeemed.</Text>
+                </View>
+              </View>
+            </Modal>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={showFormModall}
+              onRequestClose={() => {
+                setShowFormModall(false);
+              }}
+            >
+              <View style={styles.formModalContainer}>
+                <View style={styles.formModalContent}>
+                  <Text style={styles.cardText}>Redeem Key:</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Redeem Key"
+                    value={redeemKey}
+                    onChangeText={setRedeemKey}
+                    keyboardType="numeric"
+                  />
+                  <TouchableOpacity
+                    style={styles.requestSMSButton}
+                    onPress={() => {
+                      redeemVoucher(item._id, redeemKey);
+                      setShowFormModal(false);
+                    }}
+                  >
+                    <Text style={styles.requestSMSText}>Redeem</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </>
         ) : (
           <TouchableOpacity
-          style={styles.redeemButton}
-          onPress={() => setShowFormModal(true)}
-        >
-          <Text style={styles.redeemText}>Fill Form</Text>
-        </TouchableOpacity>
-          
+            style={styles.redeemButton}
+            onPress={() => 
+              {setSelectedVoucherId(item._id); // Capture voucher ID
+              setShowFormModal(true)}}
+          >
+            <Text style={styles.redeemText}>Fill Form</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
   );
 
-  const handleRequestSMS = async () => {
+  const handleRequestEmail = async () => {
     try {
-        const customerToken = await AsyncStorage.getItem('customerToken');
-        const customerId = await AsyncStorage.getItem('customerId');
-        
-        const response = await axios.post(
-            `${ipAddress}/api/ContactUsRoutes/UserRedeemInfo`,
-            {
-                customerId: customerId,
-                redeemName: name,
-                redeemPhone: phone
-            },
-            {
-                headers: {
-                    Authorization: customerToken
-                }
-            }
-        );
+      const customerToken = await AsyncStorage.getItem('customerToken');
+      const customerId = await AsyncStorage.getItem('customerId');
 
-        console.log('User redeem info sent:', response.data);
-        await AsyncStorage.setItem('canRedeem', 'true');
-        setCanRedeem(true);
-        setShowFormModal(false);
+      const response = await axios.post(
+        `${ipAddress}/api/ContactUsRoutes/UserRedeemInfo`,
+        {
+          customerId: customerId,
+          redeemName: name,
+          redeemEmail: email // Change to email
+        },
+        {
+          headers: {
+            Authorization: customerToken
+          }
+        }
+      );
+
+      console.log('User redeem info sent:', response.data);
+      await AsyncStorage.setItem('canRedeem', 'true');
+      setCanRedeem(true);
+      setShowFormModal(false);
     } catch (error) {
-        console.error('Error sending user redeem info:', error);
-        // You can add logic here to handle the error
+      console.error('Error sending user redeem info:', error);
+      // Handle the error
     }
-};
-
+  };
 
   if (loading) {
     return (
@@ -269,28 +250,26 @@ console.log(restoId)
       >
         <View style={styles.formModalContainer}>
           <View style={styles.formModalContent}>
-          <Text style={styles.cardText}>Name:</Text>
-
+            <Text style={styles.cardText}>Name:</Text>
             <TextInput
               style={styles.input}
               placeholder="Name"
               value={name}
               onChangeText={setName}
             />
-                    <Text style={styles.cardText}>Phone Num:</Text>
-
+            <Text style={styles.cardText}>Email:</Text>
             <TextInput
               style={styles.input}
-              placeholder="Phone"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
             />
             <TouchableOpacity
               style={styles.requestSMSButton}
-              onPress={handleRequestSMS}
+              onPress={handleRequestEmail} // Change to handleRequestEmail
             >
-              <Text style={styles.requestSMSText}>Request SMS Key</Text>
+              <Text style={styles.requestSMSText}>Request Email Key</Text>
             </TouchableOpacity>
           </View>
         </View>
