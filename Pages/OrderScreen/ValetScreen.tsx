@@ -118,12 +118,12 @@ const ValetScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <Text style={styles.label}>Enter _id:</Text>
+        <Text style={styles.label}>Enter Card Number:</Text>
         <TextInput
           style={styles.input}
           value={id}
           onChangeText={setId}
-          placeholder="Enter _id"
+          placeholder="Enter Card Number"
           placeholderTextColor="#ccc"
         />
 

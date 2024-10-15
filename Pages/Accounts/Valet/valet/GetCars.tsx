@@ -113,7 +113,7 @@ const GetCars = () => {
           <Text style={styles.text}>Color: {item.color}</Text>
           
           <View style={styles.buttonContainer}>
-            {[1, 2, 3, 4, 5].map((number) => (
+            {[3, 5, 8, 10, 15].map((number) => (
              <TouchableOpacity key={number} style={styles.numberButton} onPress={() => logNumber(number, item._id)}>
              <Text style={styles.numberButtonText}>{number}</Text>
            </TouchableOpacity>

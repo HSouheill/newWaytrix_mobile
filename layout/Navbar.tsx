@@ -1,5 +1,5 @@
 import React,{useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, SafeAreaView, Image } from 'react-native';
 import { NavigationContainer, useNavigation, DrawerActions } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions } from '@react-navigation/drawer';
 import { Feather } from '@expo/vector-icons';
@@ -112,7 +112,11 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
   return (
     <TapGestureHandler onActivated={handleTripleTap} numberOfTaps={1}>
     <Animated.View style={[styles.drawerContent, { opacity: fadeAnim }]}>
-      <Text style={styles.drawerHeaderText}>{zalgoText}</Text>
+      {/* <Text style={styles.drawerHeaderText}>{zalgoText}</Text> */}
+      <View style={styles.headerContainer}>
+          <Image source={require('../Pages/waytrix3.png')} style={styles.logo} />
+          <Text style={styles.drawerHeaderText}>WAYTRIX</Text>
+        </View>
       <TouchableOpacity
         style={styles.drawerItem}
         onPress={() => {
@@ -188,22 +192,38 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingHorizontal: 25,
     backgroundColor: 'rgba(20, 20, 20, 0.95)',
+  },
+  headerContainer: {
+    marginHorizontal: -10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+    borderColor: '#fff',  // White border
+    borderWidth: 4,  // Border width to make it more visible
+    borderRadius: 15,  // Increased border radius for rounded corners
+  },
+  logo: {
+    width: 95,
+    height: 70,
+    marginRight: 5,
+    marginLeft: 5,
   },
   drawerHeaderText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: 'bold',
     textAlign: 'center',
     textTransform: 'uppercase',
-    marginTop: -30, 
-    paddingVertical: 20,
-    marginBottom: 30,//Johnny sadaka svg
+    // marginTop: -30, 
+    paddingVertical: 18,
+    marginBottom: 8,//Johnny sadaka svg
     borderRadius: 15,  // Increased border radius for rounded corners
-    borderColor: '#fff',  // White border
-    borderWidth: 4,  // Border width to make it more visible
+    // borderColor: '#fff',  // White border
+    // borderWidth: 4,  // Border width to make it more visible
     letterSpacing: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
