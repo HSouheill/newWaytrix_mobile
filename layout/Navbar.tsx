@@ -1,9 +1,10 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, SafeAreaView } from 'react-native';
 import { NavigationContainer, useNavigation, DrawerActions } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions } from '@react-navigation/drawer';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TapGestureHandler } from 'react-native-gesture-handler';
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get('window');
@@ -63,6 +64,8 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
   const [zalgoText, setZalgoText] = React.useState(generateZalgoText("Waytrix"));
   const [customerToken, setCustomerToken] = useState<string | null>(null);
   const [valetToken, setValetToken] = useState<string | null>(null);
+  const [tapCount, setTapCount] = useState(0);
+  const timeoutId = useRef(null);
 
   const checkCustomerToken = async () => {
     const customerToken = await AsyncStorage.getItem('customerToken');
@@ -86,7 +89,28 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
     }).start();
   }, [fadeAnim]);
 
+
+
+
+  const handleTripleTap = () => {
+    setTapCount(prevCount => prevCount + 1);
+    
+    // Reset the tap count after a short delay (500ms)
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+    timeoutId.current = setTimeout(() => setTapCount(0), 500);
+
+    if (tapCount === 2) {
+      // Triple tap detected, perform logout
+      deleteCustomerToken();
+      navigation.navigate('TableLogout', { title: 'Table Logout' });  // Redirect after logout
+    }
+  };
+
+
   return (
+    <TapGestureHandler onActivated={handleTripleTap} numberOfTaps={1}>
     <Animated.View style={[styles.drawerContent, { opacity: fadeAnim }]}>
       <Text style={styles.drawerHeaderText}>{zalgoText}</Text>
       <TouchableOpacity
@@ -138,7 +162,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         <Text style={styles.drawerText}>Bonus Page</Text>
       </TouchableOpacity>
       {/* logout table */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.drawerItem}
         onPress={() => {
           setZalgoText(generateZalgoText("Waytrix"));
@@ -147,7 +171,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
       >
         
         <Text style={styles.drawerText}>Table Logout</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {(customerToken || valetToken) &&
       <TouchableOpacity
         style={styles.drawerItem}
@@ -157,6 +181,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         <Text style={styles.drawerText}>Logout</Text>
       </TouchableOpacity>}
     </Animated.View>
+    </TapGestureHandler>
   );
 };
 
