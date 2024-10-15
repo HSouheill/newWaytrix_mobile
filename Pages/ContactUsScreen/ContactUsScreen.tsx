@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    textTransform: 'uppercase',  // This forces the text to be capitalized
   },
   modalBackground: {
     flex: 1,

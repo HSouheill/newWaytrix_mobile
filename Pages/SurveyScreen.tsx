@@ -278,6 +278,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#54525a', // Darker background for input
     borderWidth: 4,
     borderColor: '#fff',
+    fontWeight: 'bold',
     borderRadius: 4,
     padding: 10,
     color: 'white', // Text color inside inputs changed to white

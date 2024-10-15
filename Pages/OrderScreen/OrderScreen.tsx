@@ -161,10 +161,10 @@ export default function SettingsScreen({ navigation }) {
     <View style={styles.container}>
       <View style={styles.bigButtonContainer}>
         <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('MenuScreen')}>
-          <Text style={styles.bigButtonText}>Menu</Text>
+          <Text style={styles.bigButtonText}>MENU</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('ValetScreen')}>
-          <Text style={styles.bigButtonText}>Valet</Text>
+          <Text style={styles.bigButtonText}>VALET</Text>
         </TouchableOpacity>
       </View>
             {/* <SvgUri width="100%" height="100%" uri="http://74.208.98.3:3030/uploads/image-1719996835746.svg" />

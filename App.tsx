@@ -173,7 +173,7 @@ setTableToken(tableToken);
                 component={valetToken ? ValetAccountScreen : HomeScreen}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Home" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
                   ),
                 }}
               />:
@@ -182,7 +182,7 @@ setTableToken(tableToken);
                 component={valetToken ? ValetAccountScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Home" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -193,7 +193,7 @@ setTableToken(tableToken);
                 component={tableToken ? TableLogout : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Table Logout" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="TABLE LOGOUT" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -203,7 +203,7 @@ setTableToken(tableToken);
                 component={tableToken ? SurveyScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Survey Screen" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="SURVEY SCREEN" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -212,7 +212,7 @@ setTableToken(tableToken);
                 component={tableToken ? CarTimer : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Time To Get Your Car" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="TIME TO GET YOUR CAR" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -221,7 +221,7 @@ setTableToken(tableToken);
                 component={tableToken ? MenuScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Menu Screen" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="MENU SCREEN" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -231,7 +231,7 @@ setTableToken(tableToken);
                 component={tableToken ? ValetScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Valet Screen" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
                   ),
                 }}
                 // fhoeruihfiuerhf8w38742y4rfhej
@@ -240,7 +240,7 @@ setTableToken(tableToken);
               component={tableToken ? SignInUpCustomer : TableSignIN}
               options={{
                 header: ({ navigation }) => (
-                  <Header navigation={navigation} title="Valet Screen" onPress={onPressScreen} />
+                  <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
                 ),
               }}
             />  }
@@ -250,7 +250,7 @@ setTableToken(tableToken);
                 component={ForgotPass}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Forgot Pass" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="FORGOT PASS" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -259,7 +259,7 @@ setTableToken(tableToken);
                 component={tableToken ? ContactUsScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Contact Us" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="CONTACT US" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -271,7 +271,7 @@ setTableToken(tableToken);
                 component={tableToken ? BonusScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Bonus Screen" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="BONUS SCREEN" onPress={onPressScreen} />
                   ),
                 }}
               /> 
@@ -280,7 +280,7 @@ setTableToken(tableToken);
                 component={tableToken ? RedeemPage : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Redeem Page" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="REDEEM PAGE" onPress={onPressScreen} />
                   ),
                 }}
               /> 
@@ -292,7 +292,7 @@ setTableToken(tableToken);
                 component={SignInUpCustomer}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Sign IN/UP Customer" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
                   ),
                 }}
               /> 
@@ -301,7 +301,7 @@ setTableToken(tableToken);
                 component={SignInUpCustomer}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Sign IN/UP Customer" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
                   ),
                 }}
               /> 
@@ -313,7 +313,7 @@ setTableToken(tableToken);
                 component={tableToken ? OrderScreen : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Orders Screen" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="ORDER SCREEN" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -328,7 +328,7 @@ setTableToken(tableToken);
                 component={ValetAccountScreen}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Valet" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
                   ),
                 }}
               />:
@@ -337,7 +337,7 @@ setTableToken(tableToken);
                 component={ValetLogin}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="Valet" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
                   ),
                 }}
               />}
@@ -361,11 +361,11 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#141414',
+    backgroundColor: '#8e8a9b',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#8e8a9b',
   },
   backButton: {
     marginRight: 10,
