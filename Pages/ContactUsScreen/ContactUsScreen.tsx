@@ -92,27 +92,30 @@ const ContactUsScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.container} >
       <TouchableWithoutFeedback onPress={handlePageClick}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>NAME</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your name"
+          placeholder="ENTER YOUR NAME"
+          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
           value={name}
           onChangeText={setName}
         />
 
-        <Text style={styles.label}>Phone</Text>
+        <Text style={styles.label}>PHONE</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your phone number"
+          placeholder="ENTER YOUR PHONE NUMBER"
+          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
         />
 
-        <Text style={styles.label}>Text</Text>
+        <Text style={styles.label}>TEXT</Text>
         <TextInput
           style={[styles.input, styles.textInput]}
-          placeholder="Enter your message"
+          placeholder="ENTER YOUR MESSAGE"
+          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
           value={text}
           onChangeText={setText}
           multiline
@@ -144,19 +147,20 @@ const ContactUsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'black',
     padding: 20,
   },
   label: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
   },
   input: {
-    borderColor: '#000',
-    borderWidth: 3,
-    color: '#000',
+    borderColor: '#fff',
+    borderWidth: 4,
+    backgroundColor: '#333333', // Dark background
+    color: '#b8b8b8', // Text color inside input
     fontWeight: 'bold',
     borderRadius: 5,
     padding: 10,
@@ -165,10 +169,13 @@ const styles = StyleSheet.create({
   textInput: {
     height: 100,
     textAlignVertical: 'top',
+    color: '#fff',
   },
   submitButton: {
-    backgroundColor: 'black',
-    borderRadius: 5,
+    backgroundColor: '#8e8a9b',
+    borderRadius: 4,
+    borderColor: '#fff',
+    borderWidth: 4,
     padding: 15,
     alignItems: 'center',
   },

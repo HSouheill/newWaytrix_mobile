@@ -182,14 +182,14 @@ export default function SettingsScreen({ navigation }) {
 {/* https://www.svgrepo.com/show/235732/napkins-napkin.svg */}
       <Image
         source={require('./svg/napkins.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       />
               <Text style={styles.cardText}>Napkins</Text>
             </TouchableOpacity>
           )}
           {sugar && (
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('sugar')}>
-              <Ionicons name="cube" size={40} color="#000" />
+              <Ionicons name="cube" size={40} color="#fff" />
               <Text style={styles.cardText}>Sugar</Text>
             </TouchableOpacity>
           )}
@@ -198,14 +198,14 @@ export default function SettingsScreen({ navigation }) {
 {/* https://www.svgrepo.com/show/398243/salt.svg */}
 <Image
         source={require('./svg/salt.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       />
               <Text style={styles.cardText}>Salt</Text>
             </TouchableOpacity>
           )}
           {oil && (
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('oil')}>
-              <Ionicons name="water" size={40} color="#000" />
+              <Ionicons name="water" size={40} color="#fff" />
               <Text style={styles.cardText}>Oil</Text>
             </TouchableOpacity>
           )}
@@ -219,7 +219,7 @@ export default function SettingsScreen({ navigation }) {
 {/* https://www.svgrepo.com/show/490113/glass-of-whiskey.svg */}
 <Image
         source={require('./svg/glassofice.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       />
               <Text style={styles.cardText}>Glass of Ice</Text>
             </TouchableOpacity>
@@ -228,7 +228,7 @@ export default function SettingsScreen({ navigation }) {
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('emptyGlass')}>
 <Image
         source={require('./svg/emptyGlass.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       /> 
                    <Text style={styles.cardText}>Empty Glass</Text>
             </TouchableOpacity>
@@ -238,7 +238,7 @@ export default function SettingsScreen({ navigation }) {
 {/* https://www.svgrepo.com/show/104306/plate.svg */}
 <Image
         source={require('./svg/emptyPlate.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       /> 
               <Text style={styles.cardText}>Sous Plat</Text>
             </TouchableOpacity>
@@ -248,7 +248,7 @@ export default function SettingsScreen({ navigation }) {
 {/* https://www.svgrepo.com/show/483175/bill.svg */}
 <Image
         source={require('./svg/bill.png')}
-        style={{width:50,height:50}}
+        style={{ width: 50, height: 50, tintColor: 'white' }}
       /> 
               <Text style={styles.cardText}>Bill</Text>
             </TouchableOpacity>
@@ -258,14 +258,14 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.row}>
           {shishaCharcoal && (
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('shishaCharcoal')}>
-              <Ionicons name="flame" size={40} color="#000" />
+              <Ionicons name="flame" size={40} color="#fff" />
               <Text style={styles.cardText}>Shisha Charcoal</Text>
             </TouchableOpacity>
           )}
           {toothpick && (
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('toothpick')}>
 <Image source ={require('./svg/toothpick.png')}
-style={{width:50,height:50}}/>
+style={{ width: 50, height: 50, tintColor: 'white' }}/>
 {/* https://www.svgrepo.com/show/117366/dish-and-toothpick.svg */}
               <Text style={styles.cardText}>Toothpick</Text>
             </TouchableOpacity>
@@ -273,7 +273,7 @@ style={{width:50,height:50}}/>
           {ketchup && (
             <TouchableOpacity style={styles.card} onPress={() => handleOrder('ketchup')}>
 <Image source ={require('./svg/ketchup.png')}
-style={{width:50,height:50}}/>
+style={{ width: 50, height: 50, tintColor: 'white' }}/>
 
               <Text style={styles.cardText}>Ketchup</Text>
             </TouchableOpacity>
@@ -312,9 +312,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin:5,
     padding: 10,
-    backgroundColor: '#fff', // Adjust this according to your design
+    backgroundColor: '#8e8a9b', // Adjust this according to your design
+    color: '#fff',
     borderRadius: 8,
     elevation: 2,
+    borderWidth: 4,  // Add this
+    borderColor: '#fff',  // Add this
   },
   cardContainerrow:{
     width: '23%', // Adjust the width to fit 4 cards in a row with some spacing
@@ -357,17 +360,19 @@ const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#8e8a9b',  //fffffff
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
     width: '20%',
+    borderWidth: 4,  // Add this
+    borderColor: '#fff',  // Add this
   },
   cardText: {
     marginTop: 10,
     fontWeight:'bold',
     fontSize: 18,
-    color: '#000',
+    color: '#fff',//color of text
     textAlign: 'center',
   },
   bigButtonContainer: {
@@ -378,15 +383,17 @@ const styles = StyleSheet.create({
   },
   bigButton: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#8e8a9b',
     paddingVertical: 20,
     marginHorizontal: 10,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 4,  // Add this
+    borderColor: '#fff',  // Add this
   },
   bigButtonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -423,9 +430,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 10,
+    borderWidth: 4,  // Add this
+    borderColor: '#fff',  // Add this
   },
   customButtonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },

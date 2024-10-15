@@ -173,6 +173,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     textTransform: 'uppercase',
+    marginTop: -30, 
+    paddingVertical: 20,
+    marginBottom: 30,//Johnny sadaka svg
+    borderRadius: 15,  // Increased border radius for rounded corners
+    borderColor: '#fff',  // White border
+    borderWidth: 4,  // Border width to make it more visible
     letterSpacing: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
@@ -182,10 +188,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 15,
     marginVertical: 5,
-    backgroundColor: '#1f1f1f',
-    borderRadius: 10,
-    borderColor: '#333',
-    borderWidth: 1,
+    backgroundColor: '#8e8a9b',  // Lighter gray background
+    borderRadius: 35,  // Increased border radius for rounded corners
+    borderColor: '#fff',  // White border
+    borderWidth: 4,  // Border width to make it more visible
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -196,12 +202,12 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   drawerText: {
-    color: 'white',
+    color: '#fff',  
     fontSize: 20,
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    // textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },

@@ -26,7 +26,7 @@ const Partner = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Our Partners</Text>
+      <Text style={styles.title}>OUR PARTNERS</Text>
       <ScrollView>
         {partners.map((partner, index) => (
           <TouchableOpacity activeOpacity={1} key={index} style={styles.partnerContainer}>
@@ -47,23 +47,28 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 20,
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'black',
     padding: 20,
+    borderColor: '#fff',
+    borderWidth: 4,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: 'white',
   },
   partnerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
     marginBottom: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#333333',
     borderRadius: 10,
-    shadowColor: '#000',
+    borderColor: '#fff',
+    borderWidth: 4,
+    shadowColor: '#fff',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -85,13 +90,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
+    color: 'white',
   },
   phone: {
-    color: '#999',
+    color: '#b8b8b8',
     marginBottom: 5,
   },
   description: {
-    color: '#666',
+    color: '#b8b8b8',
   },
 });
 
