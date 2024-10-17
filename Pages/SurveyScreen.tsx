@@ -127,11 +127,34 @@ const SurveyScreen = ({ navigation }) => {
       <View style={styles.questionContainer}>
         <Text style={styles.label}>QUALITY OF FOOD:</Text>
         <View style={styles.buttonContainer}>
-          <Button  title="Excellent" onPress={() => handleQualitySelection('Excellent', setFoodQuality)} color={foodQuality === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setFoodQuality)} color={foodQuality === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setFoodQuality)} color={foodQuality === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setFoodQuality)} color={foodQuality === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+        <TouchableOpacity
+          style={[styles.ratingButton, foodQuality === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+          onPress={() => handleQualitySelection('Excellent', setFoodQuality)}
+        >
+          <Text style={styles.buttonText}>Excellent</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ratingButton, foodQuality === 'Good' ? styles.goodButton : styles.defaultButton]}
+          onPress={() => handleQualitySelection('Good', setFoodQuality)}
+        >
+          <Text style={styles.buttonText}>Good</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ratingButton, foodQuality === 'Average' ? styles.averageButton : styles.defaultButton]}
+          onPress={() => handleQualitySelection('Average', setFoodQuality)}
+        >
+          <Text style={styles.buttonText}>Average</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ratingButton, foodQuality === 'Poor' ? styles.poorButton : styles.defaultButton]}
+          onPress={() => handleQualitySelection('Poor', setFoodQuality)}
+        >
+          <Text style={styles.buttonText}>Poor</Text>
+        </TouchableOpacity>
+      </View>
       </View>
 
       {/* Repeat similar structures for other questions */}
@@ -139,66 +162,204 @@ const SurveyScreen = ({ navigation }) => {
       <View style={styles.questionContainer}>
         <Text style={styles.label}>QUALITY OF SERVICE:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setServiceQuality)} color={serviceQuality === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setServiceQuality)} color={serviceQuality === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setServiceQuality)} color={serviceQuality === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setServiceQuality)} color={serviceQuality === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+      <TouchableOpacity
+        style={[styles.ratingButton, serviceQuality === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+        onPress={() => handleQualitySelection('Excellent', setServiceQuality)}
+      >
+        <Text style={styles.buttonText}>Excellent</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.ratingButton, serviceQuality === 'Good' ? styles.goodButton : styles.defaultButton]}
+        onPress={() => handleQualitySelection('Good', setServiceQuality)}
+      >
+        <Text style={styles.buttonText}>Good</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.ratingButton, serviceQuality === 'Average' ? styles.averageButton : styles.defaultButton]}
+        onPress={() => handleQualitySelection('Average', setServiceQuality)}
+      >
+        <Text style={styles.buttonText}>Average</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.ratingButton, serviceQuality === 'Poor' ? styles.poorButton : styles.defaultButton]}
+        onPress={() => handleQualitySelection('Poor', setServiceQuality)}
+      >
+        <Text style={styles.buttonText}>Poor</Text>
+      </TouchableOpacity>
+    </View>
       </View>
 
       {/* Friendliness of Staff */}
       <View style={styles.questionContainer}>
         <Text style={styles.label}>FRIENDLINESS OF STAFF:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setStaffFriendliness)} color={staffFriendliness === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setStaffFriendliness)} color={staffFriendliness === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setStaffFriendliness)} color={staffFriendliness === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setStaffFriendliness)} color={staffFriendliness === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+    <TouchableOpacity
+      style={[styles.ratingButton, staffFriendliness === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+      onPress={() => handleQualitySelection('Excellent', setStaffFriendliness)}
+    >
+      <Text style={styles.buttonText}>Excellent</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.ratingButton, staffFriendliness === 'Good' ? styles.goodButton : styles.defaultButton]}
+      onPress={() => handleQualitySelection('Good', setStaffFriendliness)}
+    >
+      <Text style={styles.buttonText}>Good</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.ratingButton, staffFriendliness === 'Average' ? styles.averageButton : styles.defaultButton]}
+      onPress={() => handleQualitySelection('Average', setStaffFriendliness)}
+    >
+      <Text style={styles.buttonText}>Average</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.ratingButton, staffFriendliness === 'Poor' ? styles.poorButton : styles.defaultButton]}
+      onPress={() => handleQualitySelection('Poor', setStaffFriendliness)}
+    >
+      <Text style={styles.buttonText}>Poor</Text>
+    </TouchableOpacity>
+      </View>
       </View>
 
       {/* Value for Money */}
       <View style={styles.questionContainer}>
         <Text style={styles.label}>VALUE FOR MONEY:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setValueForMoney)} color={valueForMoney === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setValueForMoney)} color={valueForMoney === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setValueForMoney)} color={valueForMoney === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setValueForMoney)} color={valueForMoney === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+  <TouchableOpacity
+    style={[styles.ratingButton, valueForMoney === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Excellent', setValueForMoney)}
+  >
+    <Text style={styles.buttonText}>Excellent</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, valueForMoney === 'Good' ? styles.goodButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Good', setValueForMoney)}
+  >
+    <Text style={styles.buttonText}>Good</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, valueForMoney === 'Average' ? styles.averageButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Average', setValueForMoney)}
+  >
+    <Text style={styles.buttonText}>Average</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, valueForMoney === 'Poor' ? styles.poorButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Poor', setValueForMoney)}
+  >
+    <Text style={styles.buttonText}>Poor</Text>
+  </TouchableOpacity>
+</View>
       </View>
 
       {/* Cleanliness of Restaurant */}
       <View style={styles.questionContainer}>
         <Text style={styles.label}>CLEANLINESS OF RESTAURANT:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setRestaurantCleanliness)} color={restaurantCleanliness === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setRestaurantCleanliness)} color={restaurantCleanliness === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setRestaurantCleanliness)} color={restaurantCleanliness === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setRestaurantCleanliness)} color={restaurantCleanliness === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantCleanliness === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Excellent', setRestaurantCleanliness)}
+  >
+    <Text style={styles.buttonText}>Excellent</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantCleanliness === 'Good' ? styles.goodButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Good', setRestaurantCleanliness)}
+  >
+    <Text style={styles.buttonText}>Good</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantCleanliness === 'Average' ? styles.averageButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Average', setRestaurantCleanliness)}
+  >
+    <Text style={styles.buttonText}>Average</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantCleanliness === 'Poor' ? styles.poorButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Poor', setRestaurantCleanliness)}
+  >
+    <Text style={styles.buttonText}>Poor</Text>
+  </TouchableOpacity>
+</View>
       </View>
 
       {/* Restaurant Design */}
       <View style={styles.questionContainer}>
         <Text style={styles.label}>RESTAURANT DESIGN:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setRestaurantDesign)} color={restaurantDesign === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setRestaurantDesign)} color={restaurantDesign === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setRestaurantDesign)} color={restaurantDesign === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setRestaurantDesign)} color={restaurantDesign === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantDesign === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Excellent', setRestaurantDesign)}
+  >
+    <Text style={styles.buttonText}>Excellent</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantDesign === 'Good' ? styles.goodButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Good', setRestaurantDesign)}
+  >
+    <Text style={styles.buttonText}>Good</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantDesign === 'Average' ? styles.averageButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Average', setRestaurantDesign)}
+  >
+    <Text style={styles.buttonText}>Average</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, restaurantDesign === 'Poor' ? styles.poorButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Poor', setRestaurantDesign)}
+  >
+    <Text style={styles.buttonText}>Poor</Text>
+  </TouchableOpacity>
+</View>
       </View>
 
       {/* WayTrix Device Service */}
       <View style={styles.questionContainer}>
         <Text style={styles.label}>WAYTRIX DEVICE SERVICE:</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Excellent" onPress={() => handleQualitySelection('Excellent', setWayTrixService)} color={wayTrixService === 'Excellent' ? 'green' : '#8e8a9b'} />
-          <Button title="Good" onPress={() => handleQualitySelection('Good', setWayTrixService)} color={wayTrixService === 'Good' ? '#90EE90' : '#8e8a9b'} />
-          <Button title="Average" onPress={() => handleQualitySelection('Average', setWayTrixService)} color={wayTrixService === 'Average' ? '#b5ad26' : '#8e8a9b'} />
-          <Button title="Poor" onPress={() => handleQualitySelection('Poor', setWayTrixService)} color={wayTrixService === 'Poor' ? 'red' : '#8e8a9b'} />
-        </View>
+  <TouchableOpacity
+    style={[styles.ratingButton, wayTrixService === 'Excellent' ? styles.excellentButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Excellent', setWayTrixService)}
+  >
+    <Text style={styles.buttonText}>Excellent</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, wayTrixService === 'Good' ? styles.goodButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Good', setWayTrixService)}
+  >
+    <Text style={styles.buttonText}>Good</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, wayTrixService === 'Average' ? styles.averageButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Average', setWayTrixService)}
+  >
+    <Text style={styles.buttonText}>Average</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={[styles.ratingButton, wayTrixService === 'Poor' ? styles.poorButton : styles.defaultButton]}
+    onPress={() => handleQualitySelection('Poor', setWayTrixService)}
+  >
+    <Text style={styles.buttonText}>Poor</Text>
+  </TouchableOpacity>
+</View>
       </View>
 
       <View style={styles.questionContainer}>
@@ -252,10 +413,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'black',
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: 'black',
     borderWidth: 5,
     borderColor: 'white',
     borderRadius: 10,
@@ -285,7 +446,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   submitButton: {
-    backgroundColor: '#54525a', // Darker button background
+    backgroundColor: '#8e8a9b', // Darker button background
     borderWidth: 4,
     borderColor: '#fff',
     padding: 10,
@@ -298,6 +459,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase', // Force text to uppercase
   },
+
+  ratingButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 4,
+    backgroundColor: '#8e8a9b',
+    borderColor: '#fff',
+    borderRadius: 10,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textTransform: 'uppercase', // Force text to uppercase
+  },
+  
+  defaultButton: {
+    backgroundColor: '#8e8a9b', // Default background color for unselected buttons
+  },
+  
+  excellentButton: {
+    backgroundColor: 'green', // Background color for Excellent
+  },
+  
+  goodButton: {
+    backgroundColor: '#90EE90', // Background color for Good
+  },
+  
+  averageButton: {
+    backgroundColor: '#b5ad26', // Background color for Average
+  },
+  
+  poorButton: {
+    backgroundColor: 'red', // Background color for Poor
+  },
+  
 });
 
 

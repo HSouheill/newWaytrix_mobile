@@ -124,7 +124,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           navigation.navigate('Home', { title: 'Home' });
         }}
       >
-        <Text style={styles.drawerText}>Home</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/home2.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+          <Text style={styles.drawerText}>Home</Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.drawerItem}
@@ -133,7 +139,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           navigation.navigate('OrderScreen', { title: 'Orders Screen' });
         }}
       >
-        <Text style={styles.drawerText}>Order Screen</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/pointer2.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+          <Text style={styles.drawerText}>Order Screen</Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.drawerItem}
@@ -142,7 +154,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           navigation.navigate('SurveyScreen', { title: 'Survey Screen' });
         }}
       >
-        <Text style={styles.drawerText}>Survey Screen</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/tick2.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+          <Text style={styles.drawerText}>Survey Screen</Text>
+        </View>
       </TouchableOpacity>
       {/* ContactUsScreen */}
       <TouchableOpacity
@@ -153,7 +171,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         }}
       >
         
-        <Text style={styles.drawerText}>Contact Us</Text>
+        <Text style={[styles.drawerText, { marginLeft: 40 }]}>Contact Us</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.drawerItem}
@@ -163,7 +181,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         }}
       >
         
-        <Text style={styles.drawerText}>Bonus Page</Text>
+        <Text style={[styles.drawerText, { marginLeft: 40 }]}>Bonus Page</Text>
       </TouchableOpacity>
       {/* logout table */}
       {/* <TouchableOpacity
@@ -182,7 +200,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         onPress={deleteCustomerToken}
       >
         
-        <Text style={styles.drawerText}>Logout</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/logout2.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+          <Text style={styles.drawerText}>Logout</Text>
+        </View>
       </TouchableOpacity>}
     </Animated.View>
     </TapGestureHandler>
@@ -255,6 +279,15 @@ const styles = StyleSheet.create({
     // textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
+  },
+  iconTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
   },
 });
 
