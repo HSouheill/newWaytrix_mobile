@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef  } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 // import { WebView } from 'react-native-webview';
 import { SvgUri } from 'react-native-svg';
 import ipAddress from '../../config';
+import { debounce } from 'lodash';
 export default function SettingsScreen({ navigation }) {
   const [napkins, setNapkins] = useState(false);
   const [sugar, setSugar] = useState(false);
@@ -22,6 +23,7 @@ export default function SettingsScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [customRequest, setCustomRequest] = useState('');
   const [customButtons, setCustomButtons] = useState([]);
+  const [isOrdering, setIsOrdering] = useState(false); // Using state to track ordering status
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -103,11 +105,17 @@ export default function SettingsScreen({ navigation }) {
   
 
   const handleOrder = async (order) => {
-    console.log("jewoidhiiiiiiiiiiii")
+    console.log("Handle order called for:", order); // Log the order
+    if (isOrdering) return; // Prevent multiple clicks
+    setIsOrdering(true); // Set ordering to true
+
+    console.log("Placing order:", order); // Debug log
+
     try {
       const tableId = await AsyncStorage.getItem('tableId');
       const restoId = await AsyncStorage.getItem('restoId');
       const tableToken = await AsyncStorage.getItem('tableToken');
+
       await axios.post(`${ipAddress}/api/ButtonsRoutes/AddOrder`, {
         tableId,
         order,
@@ -117,12 +125,15 @@ export default function SettingsScreen({ navigation }) {
           Authorization: tableToken
         }
       });
+
       setModalVisible(true);
       setTimeout(() => {
         setModalVisible(false);
       }, 2000);
     } catch (error) {
       console.error('Error placing order:', error);
+    } finally {
+      setIsOrdering(false); // Reset ordering status
     }
   };
   
@@ -175,121 +186,86 @@ export default function SettingsScreen({ navigation }) {
       <Text style={styles.label}>Request: </Text>
       
 
-      <ScrollView contentContainerStyle={styles.buttonContainer}>
-          <View style={styles.row}>
-          {napkins && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('napkins')}>
-{/* https://www.svgrepo.com/show/235732/napkins-napkin.svg */}
-      <Image
-        source={require('./svg/napkins.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      />
-              <Text style={styles.cardText}>Napkins</Text>
-            </TouchableOpacity>
-          )}
-          {sugar && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('sugar')}>
-              <Ionicons name="cube" size={40} color="#fff" />
-              <Text style={styles.cardText}>Sugar</Text>
-            </TouchableOpacity>
-          )}
-          {salt && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('salt')}>
-{/* https://www.svgrepo.com/show/398243/salt.svg */}
-<Image
-        source={require('./svg/salt.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      />
-              <Text style={styles.cardText}>Salt</Text>
-            </TouchableOpacity>
-          )}
-          {oil && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('oil')}>
-              <Ionicons name="water" size={40} color="#fff" />
-              <Text style={styles.cardText}>Oil</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        {/* <View style={styles.row}>
-          
-        </View> */}
-        <View style={styles.row}>
-          {glassOfIce && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('glassOfIce')}>
-{/* https://www.svgrepo.com/show/490113/glass-of-whiskey.svg */}
-<Image
-        source={require('./svg/glassofice.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      />
-              <Text style={styles.cardText}>Glass of Ice</Text>
-            </TouchableOpacity>
-          )}
-          {emptyGlass && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('emptyGlass')}>
-<Image
-        source={require('./svg/emptyGlass.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      /> 
-                   <Text style={styles.cardText}>Empty Glass</Text>
-            </TouchableOpacity>
-          )}
-           {sousPlat && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('sousPlat')}>
-{/* https://www.svgrepo.com/show/104306/plate.svg */}
-<Image
-        source={require('./svg/emptyPlate.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      /> 
-              <Text style={styles.cardText}>Sous Plat</Text>
-            </TouchableOpacity>
-          )}
-          {bill && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('bill')}>
-{/* https://www.svgrepo.com/show/483175/bill.svg */}
-<Image
-        source={require('./svg/bill.png')}
-        style={{ width: 50, height: 50, tintColor: 'white' }}
-      /> 
-              <Text style={styles.cardText}>Bill</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        
-        <View style={styles.row}>
-          {shishaCharcoal && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('shishaCharcoal')}>
-              <Ionicons name="flame" size={40} color="#fff" />
-              <Text style={styles.cardText}>Shisha Charcoal</Text>
-            </TouchableOpacity>
-          )}
-          {toothpick && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('toothpick')}>
-<Image source ={require('./svg/toothpick.png')}
-style={{ width: 50, height: 50, tintColor: 'white' }}/>
-{/* https://www.svgrepo.com/show/117366/dish-and-toothpick.svg */}
-              <Text style={styles.cardText}>Toothpick</Text>
-            </TouchableOpacity>
-          )}
-          {ketchup && (
-            <TouchableOpacity style={styles.card} onPress={() => handleOrder('ketchup')}>
-<Image source ={require('./svg/ketchup.png')}
-style={{ width: 50, height: 50, tintColor: 'white' }}/>
-
-              <Text style={styles.cardText}>Ketchup</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        <View style={styles.containerrow}>
-        {customButtons.map((button) => (
-                  <View key={button._id} style={styles.cardContainerrow}>
-    <TouchableOpacity key={button._id} style={styles.cardrow} onPress={() => handleOrder(button.order)}>
-     
-      <SvgUri width="50" height="50" uri={button.svgLink} />
-      <Text style={styles.cardText}>{button.order}</Text>
-    </TouchableOpacity></View>
-  ))}        
+      <ScrollView contentContainerStyle={styles.buttonContainer} showsVerticalScrollIndicator={false}>
+  <View style={styles.buttonRow}>
+    {napkins && (
+      <TouchableOpacity 
+      style={styles.card}
+      onPress={() => handleOrder('napkins')}
+      disabled={isOrdering} // Disable button when ordering
+      >
+        <Image source={require('./svg/napkins.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Napkins</Text>
+      </TouchableOpacity>
+    )}
+    {sugar && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('sugar')}>
+        <Ionicons name="cube" size={40} color="#fff" />
+        <Text style={styles.cardText}>Sugar</Text>
+      </TouchableOpacity>
+    )}
+    {salt && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('salt')}>
+        <Image source={require('./svg/salt.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Salt</Text>
+      </TouchableOpacity>
+    )}
+    {oil && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('oil')}>
+        <Ionicons name="water" size={40} color="#fff" />
+        <Text style={styles.cardText}>Oil</Text>
+      </TouchableOpacity>
+    )}
+    {glassOfIce && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('glassOfIce')}>
+        <Image source={require('./svg/glassofice.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Glass of Ice</Text>
+      </TouchableOpacity>
+    )}
+    {emptyGlass && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('emptyGlass')}>
+        <Image source={require('./svg/emptyGlass.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Empty Glass</Text>
+      </TouchableOpacity>
+    )}
+    {sousPlat && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('sousPlat')}>
+        <Image source={require('./svg/emptyPlate.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Sous Plat</Text>
+      </TouchableOpacity>
+    )}
+    {bill && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('bill')}>
+        <Image source={require('./svg/bill.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Bill</Text>
+      </TouchableOpacity>
+    )}
+    {shishaCharcoal && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('shishaCharcoal')}>
+        <Ionicons name="flame" size={40} color="#fff" />
+        <Text style={styles.cardText}>Shisha Charcoal</Text>
+      </TouchableOpacity>
+    )}
+    {toothpick && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('toothpick')}>
+        <Image source={require('./svg/toothpick.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Toothpick</Text>
+      </TouchableOpacity>
+    )}
+    {ketchup && (
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('ketchup')}>
+        <Image source={require('./svg/ketchup.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Ketchup</Text>
+      </TouchableOpacity>
+    )}
+    {customButtons.map((button) => (
+      <TouchableOpacity key={button._id} style={styles.card} onPress={() => handleOrder(button.order)}>
+        <SvgUri width="50" height="50" uri={button.svgLink} />
+        <Text style={styles.cardText}>{button.order}</Text>
+      </TouchableOpacity>
+    ))}
   </View>
-      </ScrollView>
+</ScrollView>
  
       <Modal
         animationType="fade"
@@ -307,28 +283,63 @@ style={{ width: 50, height: 50, tintColor: 'white' }}/>
 }
 
 const styles = StyleSheet.create({
-  cardrow:{
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin:5,
-    padding: 10,
-    backgroundColor: '#8e8a9b', // Adjust this according to your design
-    color: '#fff',
-    borderRadius: 8,
-    elevation: 2,
-    borderWidth: 4,  // Add this
-    borderColor: '#fff',  // Add this
-  },
-  cardContainerrow:{
-    width: '23%', // Adjust the width to fit 4 cards in a row with some spacing
-    marginBottom: 10,
-  },
-  containerrow:{
-    flex: 1,
+  buttonContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    width: '100%',
+    padding: 10,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  card: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8e8a9b',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 10,
+    width: '30%', // Adjust width for better responsiveness
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    tintColor: 'white',
+  },
+  cardText: {
+    marginTop: 10,
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  containerrow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  cardContainerrow: {
+    width: '23%', // Adjusts to fit 4 cards per row
+    marginBottom: 10,
+    marginHorizontal: 5, // Space between buttons
+  },
+  cardrow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#8e8a9b',
+    borderRadius: 8,
+    elevation: 2,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  
   container: {
     flex: 1,
     backgroundColor: 'black',
@@ -347,34 +358,15 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
-  buttonContainer: {
-    alignItems: 'center',
-    width: '100%',
-  },
+  
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 10,
   },
-  card: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#8e8a9b',  //fffffff
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 10,
-    width: '20%',
-    borderWidth: 4,  // Add this
-    borderColor: '#fff',  // Add this
-  },
-  cardText: {
-    marginTop: 10,
-    fontWeight:'bold',
-    fontSize: 18,
-    color: '#fff',//color of text
-    textAlign: 'center',
-  },
+
+  
   bigButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

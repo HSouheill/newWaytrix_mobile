@@ -1,7 +1,7 @@
 import React,{useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, SafeAreaView, Image } from 'react-native';
 import { NavigationContainer, useNavigation, DrawerActions } from '@react-navigation/native';
-import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions, useDrawerStatus  } from '@react-navigation/drawer';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TapGestureHandler } from 'react-native-gesture-handler';
@@ -60,6 +60,7 @@ const generateZalgoText = (text: string) => {
 };
 
 const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerContentOptions>) => {
+  const drawerStatus = useDrawerStatus(); // Use drawer status to track if drawer is open
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const [zalgoText, setZalgoText] = React.useState(generateZalgoText("Waytrix"));
   const [customerToken, setCustomerToken] = useState<string | null>(null);
@@ -89,6 +90,25 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
     }).start();
   }, [fadeAnim]);
 
+
+  useEffect(() => {
+    if (drawerStatus === 'open') {
+      // Trigger the fade-in animation when the drawer opens
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // Animate to opacity 0 when the drawer is closed
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [drawerStatus]);
+  
 
 
 
@@ -125,11 +145,8 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         }}
       >
         <View style={styles.iconTextContainer}>
-            <Image
-              source={require('../assets/home2.png')} // Assuming you have the icon as an SVG file
-              style={styles.icon}
-            />
-          <Text style={styles.drawerText}>Home</Text>
+            <Image source={require('../assets/home2.png')} style={styles.icon} />
+            <Text style={styles.drawerText}>Home</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -140,11 +157,8 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
         }}
       >
         <View style={styles.iconTextContainer}>
-            <Image
-              source={require('../assets/pointer2.png')} // Assuming you have the icon as an SVG file
-              style={styles.icon}
-            />
-          <Text style={styles.drawerText}>Order Screen</Text>
+            <Image source={require('../assets/pointer2.png')} style={styles.icon} />
+            <Text style={styles.drawerText}>Order Screen</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -218,7 +232,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 15,
     paddingHorizontal: 25,
-    backgroundColor: 'rgba(20, 20, 20, 0.95)',
+    backgroundColor: 'black',
+    //backgroundColor: 'rgba(20, 20, 20, 0.95)', OLD COLOR
+    borderTopWidth: 4,        
+    borderRightWidth: 4,   
+    borderBottomWidth: 4,   
+    borderColor: 'white',      // Set border color to white
+    borderLeftWidth: 0, 
+    borderRadius: 15,  // Increased border radius for rounded corners      
   },
   headerContainer: {
     marginHorizontal: -10,

@@ -88,7 +88,7 @@ const ValetScreen = ({ navigation }) => {
     <View style={styles.dropdownContainer}>
       {isVisible && (
         <TextInput
-          style={styles.input}
+        style={[styles.input, { color: 'black' }]} // Set inputted text color to black
           value={searchValue}
           onChangeText={setSearchValue}
           placeholder="Search"

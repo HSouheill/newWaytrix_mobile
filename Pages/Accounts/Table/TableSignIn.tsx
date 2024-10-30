@@ -84,7 +84,7 @@ const SignIn = () => {
       <Text style={styles.headerText}>Table Sign In</Text>
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Table Num"
+          placeholder="Email"
           value={email}
           onChangeText={setEmail}
           style={styles.input}
