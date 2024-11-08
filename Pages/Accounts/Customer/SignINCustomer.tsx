@@ -4,10 +4,12 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ipAddress from '../../../config';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
   const navigation = useNavigation();
 
   const handleSignIn = async () => {
@@ -71,14 +73,19 @@ const SignIn = () => {
         style={styles.input}
         placeholderTextColor="#fff"
       />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-        placeholderTextColor="#fff"
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          style={styles.passwordInput} // Modified style
+          placeholderTextColor="#fff"
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity onPress={handleSignIn} style={styles.button}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
@@ -87,6 +94,21 @@ const SignIn = () => {
 };
 
 const styles = StyleSheet.create({
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 5,
+    marginVertical: 5,
+    paddingRight: 10, // Padding added to keep input and icon spaced
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 10,
+    color: '#fff',
+    //fontSize: 16,
+  },
   container: {
     // flex: 1,
     justifyContent: 'center',

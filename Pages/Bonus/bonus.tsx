@@ -29,6 +29,39 @@ const SpinAndWin = () => {
   const [wonPoints, setWonPoints] = useState(0);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
+   // State to store customer data
+   const [customerName, setCustomerName] = useState("");
+   const [lastTimeSpinned, setLastTimeSpinned] = useState("");
+ 
+   useEffect(() => {
+     const fetchCustomerData = async () => {
+       const customerToken = await AsyncStorage.getItem("customerToken");
+       const customerId = await AsyncStorage.getItem("customerId");
+ 
+       if (customerToken && customerId) {
+         try {
+           const response = await axios.post(
+             `${ipAddress}/api/ContactUsRoutes/getCustomerSpinDate`,
+             { customerId },
+             {
+               headers: { authorization: `${customerToken}` },
+             }
+           );
+ 
+           if (response.status === 200) {
+             setCustomerName(response.data.name);
+             setLastTimeSpinned(response.data.lastTimeSpinned);
+           }
+         } catch (error) {
+           console.error("Failed to fetch customer data", error);
+         }
+       }
+     };
+ 
+     fetchCustomerData();
+   }, []);
+
+
   const handleWheelEnd = async (value: number) => {
     setWalletBalance(value.toString());
     labelOpacity.value = withTiming(1, { duration: 800 });
@@ -95,6 +128,12 @@ const SpinAndWin = () => {
       style={[styles.container, { paddingTop: insets.top }]}
       colors={["#fff", "#312e2e"]}
     >
+      {/* Greeting Text */}
+      <Text style={styles.greetingText}>
+        Hello, {customerName}. Number of spins remaining today is {lastTimeSpinned}
+      </Text>
+
+      {/* Wheel Component */}
       <Wheel segments={segments} onEnd={handleWheelEnd} onSpin={handleOnSpin} />
       <TouchableOpacity
         style={styles.homeButton}
@@ -128,7 +167,7 @@ const SpinAndWin = () => {
               <Text style={styles.homeButtonText}>OK</Text>
             </TouchableOpacity>
           </View>
-          </Animated.View>
+        </Animated.View>
       )}
 
       {/* Logout Button */}
@@ -142,6 +181,12 @@ const SpinAndWin = () => {
 export default SpinAndWin;
 
 const styles = StyleSheet.create({
+  greetingText: {
+    fontSize: 18,
+    color: "#333",
+    textAlign: "center",
+    marginTop: 20,
+  },
   logoutButton: {
     position: "absolute",
     bottom: 30,

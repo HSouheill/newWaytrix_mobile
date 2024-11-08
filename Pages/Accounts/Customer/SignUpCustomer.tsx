@@ -4,6 +4,7 @@ import axios from 'axios';
 import SignIn from './SignINCustomer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ipAddress from '../../../config';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Customer = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -15,6 +16,7 @@ const Customer = ({ navigation }) => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [verificationModalVisible, setVerificationModalVisible] = useState(false);
   const [verificationKey, setVerificationKey] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -136,14 +138,19 @@ const Customer = ({ navigation }) => {
             style={styles.input}
             placeholderTextColor="#fff"
           />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-            placeholderTextColor="#fff"
-          />
+          <View style={styles.passwordContainer}>
+                <TextInput
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  style={styles.passwordInput}
+                  placeholderTextColor="#fff"
+                />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
           <TextInput
             placeholder="Age"
             value={age}
@@ -212,6 +219,21 @@ const Customer = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 5,
+    marginVertical: 5,
+    paddingRight: 10, // Padding added to keep input and icon spaced
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 10,
+    color: '#fff',
+    //fontSize: 16,
+  },
   container: {
     flex: 1,
     backgroundColor: '#000',

@@ -184,8 +184,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           navigation.navigate('ContactUsScreen', { title: 'Contact Us' });
         }}
       >
-        
-        <Text style={[styles.drawerText, { marginLeft: 40 }]}>Contact Us</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/mobile1.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+        <Text style={styles.drawerText}>Contact Us</Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.drawerItem}
@@ -194,8 +199,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           navigation.navigate('BonusScreen', { title: 'Bonus Screen' });
         }}
       >
-        
-        <Text style={[styles.drawerText, { marginLeft: 40 }]}>Bonus Page</Text>
+        <View style={styles.iconTextContainer}>
+            <Image
+              source={require('../assets/party1.png')} // Assuming you have the icon as an SVG file
+              style={styles.icon}
+            />
+        <Text style={styles.drawerText}>Bonus Page</Text>
+        </View>
       </TouchableOpacity>
       {/* logout table */}
       {/* <TouchableOpacity
