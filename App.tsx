@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, TouchableWithoutFeedback, StatusBar, BackHandler, AppState } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, TouchableWithoutFeedback, StatusBar, BackHandler } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
@@ -21,6 +21,10 @@ import RedeemPage from './Pages/Bonus/RedeemYourPoints/RedeemYourPoints'
 import ValetLogin from './Pages/Accounts/Valet/ValetLogin'
 import ValetAccountScreen from './Pages/Accounts/Valet/ValetScreen'
 import CarTimer from './Pages/OrderScreen/TimerCar'
+import * as NavigationBar from 'expo-navigation-bar';
+
+
+
 const Drawer = createDrawerNavigator();
 
 interface HeaderProps {
@@ -39,8 +43,9 @@ const Header: React.FC<HeaderProps> = ({ navigation, title, onPress }) => {
           </TouchableOpacity>
         )} */}
         <Text style={styles.title}>{title}</Text>
-        <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={styles.menuButton}>
-          <Feather name="menu" size={44} color="white" />
+        <TouchableOpacity style={styles.menuButton}>
+        {/* onPress={() => navigation.toggleDrawer()} */}
+          {/* <Feather name="menu" size={44} color="white" /> */}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -54,6 +59,15 @@ const App: React.FC = () => {
   const [tableToken, setTableToken] = useState<string | null>(null);
   const [valetToken, setValetToken] = useState<string | null>(null);
   const [currentRouteName, setCurrentRouteName] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    // Hide status bar
+   // StatusBar.setHidden(true);
+
+    // Hide the navigation bar
+    NavigationBar.setVisibilityAsync('hidden');
+  }, []);
+
+
   useEffect(() => {
     // Function to delete customerToken from AsyncStorage
     const deleteToken = async () => {
@@ -166,6 +180,26 @@ setTableToken(tableToken);
             <Drawer.Navigator backBehavior="history"
               initialRouteName="Home"
               drawerContent={(props) => <CustomDrawerContent {...props} />}
+              screenOptions={{
+                  overlayColor: 'transparent', // Make the overlay color transparent if desired
+                  drawerType: tableToken ? 'slide' : 'none',  // Only show drawer if tableToken exists
+                 // drawerStyle: tableToken ? { // Adjust styles based on tableToken
+                //  drawerType: 'slide', // This will slide the drawer and push the content above
+                  //drawerStyle: {
+                    drawerStyle: tableToken ? { // Adjust styles based on tableToken
+                  height: 70, // Adjust the height to take up half the screen, or set to your preference
+                  position: 'absolute', // Position it absolutely to control placement
+                  left: 320,
+                  top: '93%',
+                  bottom: 0, // Align it to the bottom
+                  borderTopLeftRadius: 20, // Optional: round the top corners
+                  borderTopRightRadius: 20, // Optional: round the top corners
+                  backgroundColor: 'black', // Drawer background color
+                  
+                }: { display: 'none' },  // Hide drawer when no tableToken
+              }}
+              //drawerLockMode={tableToken ? 'unlocked' : 'locked-closed'}  // Lock the drawer when no tableToken
+
             >
               {tableToken?
               <Drawer.Screen
@@ -383,6 +417,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+   // marginBottom: 50, // Ensure enough space for the footer
+   // zIndex: 0, 
   },
 });
 

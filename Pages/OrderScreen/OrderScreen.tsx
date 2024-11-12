@@ -346,6 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    marginBottom: 50, // FOR FOOTER
   },
   label: {
     color: '#fff',

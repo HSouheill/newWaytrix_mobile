@@ -58,8 +58,25 @@ const SpinAndWin = () => {
        }
      };
  
+     // Fetch once immediately on mount
      fetchCustomerData();
-   }, []);
+     // Set up polling every 5 seconds
+  const intervalId = setInterval(fetchCustomerData, 5000);
+
+  // Optional: Add a WebSocket/SSE connection here for real-time updates
+  // const eventSource = new EventSource(`${ipAddress}/your-sse-endpoint`);
+  // eventSource.onmessage = (event) => {
+  //   const data = JSON.parse(event.data);
+  //   setCustomerName(data.name);
+  //   setLastTimeSpinned(data.lastTimeSpinned);
+  // };
+
+  // Clean up on component unmount
+  return () => {
+    clearInterval(intervalId);
+    // eventSource.close();
+  };
+}, []);
 
 
   const handleWheelEnd = async (value: number) => {
@@ -195,6 +212,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
+    marginBottom: 50, // FOR FOOTER
   },
   logoutButtonText: {
     color: "#fff",

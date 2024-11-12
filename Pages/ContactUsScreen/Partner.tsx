@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderColor: '#fff',
     borderWidth: 4,
+    marginBottom: 60, // FOR FOOTER
   },
   title: {
     fontSize: 24,

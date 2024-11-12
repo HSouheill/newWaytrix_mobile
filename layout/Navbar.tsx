@@ -61,7 +61,7 @@ const generateZalgoText = (text: string) => {
 
 const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerContentOptions>) => {
   const drawerStatus = useDrawerStatus(); // Use drawer status to track if drawer is open
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  //const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const [zalgoText, setZalgoText] = React.useState(generateZalgoText("Waytrix"));
   const [customerToken, setCustomerToken] = useState<string | null>(null);
   const [valetToken, setValetToken] = useState<string | null>(null);
@@ -82,32 +82,32 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
     }, 10000);
     return () => clearInterval(interval);
   }, []);
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1500,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim]);
+  // React.useEffect(() => {
+  //   Animated.timing(fadeAnim, {
+  //     toValue: 1,
+  //     duration: 1500,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [fadeAnim]);
 
 
-  useEffect(() => {
-    if (drawerStatus === 'open') {
-      // Trigger the fade-in animation when the drawer opens
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      // Animate to opacity 0 when the drawer is closed
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [drawerStatus]);
+  // useEffect(() => {
+  //   if (drawerStatus === 'open') {
+  //     // Trigger the fade-in animation when the drawer opens
+  //     Animated.timing(fadeAnim, {
+  //       toValue: 1,
+  //       duration: 300,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   } else {
+  //     // Animate to opacity 0 when the drawer is closed
+  //     Animated.timing(fadeAnim, {
+  //       toValue: 0,
+  //       duration: 800,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   }
+  // }, [drawerStatus]);
   
 
 
@@ -131,12 +131,13 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
 
   return (
     <TapGestureHandler onActivated={handleTripleTap} numberOfTaps={1}>
-    <Animated.View style={[styles.drawerContent, { opacity: fadeAnim }]}>
+    <View style={styles.drawerContent}> 
+      {/* Animated.View */}
       {/* <Text style={styles.drawerHeaderText}>{zalgoText}</Text> */}
-      <View style={styles.headerContainer}>
+      {/* <View style={styles.headerContainer}>
           <Image source={require('../Pages/waytrix3.png')} style={styles.logo} />
-          <Text style={styles.drawerHeaderText}>WAYTRIX</Text>
-        </View>
+          <Text style={styles.drawerHeaderText}></Text>
+        </View> */}
       <TouchableOpacity
         style={styles.drawerItem}
         onPress={() => {
@@ -158,7 +159,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
       >
         <View style={styles.iconTextContainer}>
             <Image source={require('../assets/pointer2.png')} style={styles.icon} />
-            <Text style={styles.drawerText}>Order Screen</Text>
+            <Text style={styles.drawerText}>Order</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -173,9 +174,25 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
               source={require('../assets/tick2.png')} // Assuming you have the icon as an SVG file
               style={styles.icon}
             />
-          <Text style={styles.drawerText}>Survey Screen</Text>
+          <Text style={styles.drawerText}>Survey</Text>
         </View>
       </TouchableOpacity>
+
+
+      <TouchableOpacity
+          
+          onPress={() => {
+            
+            navigation.navigate('Home', { title: 'Home' });
+          }}
+        >
+        <View style={styles.headerContainer}>
+            <Image source={require('../Pages/waytrix2.png')} style={styles.logo} />
+            <Text style={styles.drawerHeaderText}></Text>
+          </View>
+      </TouchableOpacity>
+
+
       {/* ContactUsScreen */}
       <TouchableOpacity
         style={styles.drawerItem}
@@ -189,7 +206,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
               source={require('../assets/mobile1.png')} // Assuming you have the icon as an SVG file
               style={styles.icon}
             />
-        <Text style={styles.drawerText}>Contact Us</Text>
+        <Text style={styles.drawerText}>Contact</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -204,7 +221,7 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
               source={require('../assets/party1.png')} // Assuming you have the icon as an SVG file
               style={styles.icon}
             />
-        <Text style={styles.drawerText}>Bonus Page</Text>
+        <Text style={styles.drawerText}>Bonus</Text>
         </View>
       </TouchableOpacity>
       {/* logout table */}
@@ -232,40 +249,55 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           <Text style={styles.drawerText}>Logout</Text>
         </View>
       </TouchableOpacity>}
-    </Animated.View>
+    </View>
     </TapGestureHandler>
   );
 };
 
 const styles = StyleSheet.create({
   drawerContent: {
-    flex: 1,
-    paddingTop: 15,
+    position: 'absolute',
+    bottom: 0,
+    height: 70,
+    flexDirection: 'row',
+    width: '190%',
+    //justifyContent: 'space-around',
+    //flex: 1,
+   // paddingTop: 15,
     paddingHorizontal: 25,
-    backgroundColor: 'black',
-    //backgroundColor: 'rgba(20, 20, 20, 0.95)', OLD COLOR
-    borderTopWidth: 4,        
-    borderRightWidth: 4,   
-    borderBottomWidth: 4,   
-    borderColor: 'white',      // Set border color to white
-    borderLeftWidth: 0, 
-    borderRadius: 15,  // Increased border radius for rounded corners      
+    //backgroundColor: 'black',
+    backgroundColor: '#212121',
+    // borderTopWidth: 4,        
+    // borderRightWidth: 4,   
+    // borderBottomWidth: 4,   
+    // borderColor: 'white',      // Set border color to white
+    // borderLeftWidth: 0, 
+    // borderRadius: 15,  // Increased border radius for rounded corners      
   },
   headerContainer: {
-    marginHorizontal: -10,
-    flexDirection: 'row',
+    height: 60,
+    width: 60,
+    //marginHorizontal: -10,
+    //flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
-    borderColor: '#fff',  // White border
-    borderWidth: 4,  // Border width to make it more visible
-    borderRadius: 15,  // Increased border radius for rounded corners
+   // paddingBottom: -100,
+  //  borderColor: '#fff',  // White border
+   // borderWidth: 2,  // Border width to make it more visible
+    borderRadius: 45,  // Increased border radius for rounded corners
+    backgroundColor: '#5a459d',
+    marginRight: 25,
+    marginLeft: 15,
+    marginTop: 4,
+   // marginLeft: 0,
   },
   logo: {
-    width: 95,
-    height: 70,
-    marginRight: 5,
-    marginLeft: 5,
+    width: 50,
+    height: 50,
+    //marginRight: 5,
+   // marginLeft: 5,
+   marginBottom: 5,
+    bottom: -35,
   },
   drawerHeaderText: {
     color: '#fff',
@@ -280,45 +312,45 @@ const styles = StyleSheet.create({
     // borderColor: '#fff',  // White border
     // borderWidth: 4,  // Border width to make it more visible
     letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+   
   },
   drawerItem: {
-    paddingVertical: 20,
+   // height: 20,
+   marginRight: 10,
+    paddingVertical: 10,
     paddingHorizontal: 15,
     marginVertical: 5,
-    backgroundColor: '#8e8a9b',  // Lighter gray background
-    borderRadius: 35,  // Increased border radius for rounded corners
-    borderColor: '#fff',  // White border
-    borderWidth: 4,  // Border width to make it more visible
+   // backgroundColor: '#8e8a9b',  // Lighter gray background
+   // borderRadius: 35,  // Increased border radius for rounded corners
+   // borderColor: '#fff',  // White border
+  //  borderWidth: 2,  // Border width to make it more visible
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
     },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
+    // shadowOpacity: 0.27,
+    // shadowRadius: 4.65,
+    // elevation: 6,
   },
   drawerText: {
     color: '#fff',  
-    fontSize: 20,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontSize: 12,
+    //fontWeight: 'bold',
+   // textTransform: 'uppercase',
     letterSpacing: 1,
     // textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
   iconTextContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
   },
   icon: {
     width: 30,
     height: 30,
-    marginRight: 10,
+    //marginRight: 0,
   },
 });
 

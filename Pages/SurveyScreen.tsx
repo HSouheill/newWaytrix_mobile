@@ -453,6 +453,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 60, // FOR FOOTER
   },
   submitButtonText: {
     color: 'white',
