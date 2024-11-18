@@ -138,8 +138,8 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
           <Image source={require('../Pages/waytrix3.png')} style={styles.logo} />
           <Text style={styles.drawerHeaderText}></Text>
         </View> */}
-      <TouchableOpacity
-        style={styles.drawerItem}
+      {/* <TouchableOpacity
+        style={[styles.drawerItem,]}
         onPress={() => {
           setZalgoText(generateZalgoText("Waytrix"));
           navigation.navigate('Home', { title: 'Home' });
@@ -149,9 +149,9 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps<DrawerC
             <Image source={require('../assets/home2.png')} style={styles.icon} />
             <Text style={styles.drawerText}>Home</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity
-        style={styles.drawerItem}
+        style={[styles.drawerItem, { marginLeft: 74 }]}  // Add marginLeft here
         onPress={() => {
           setZalgoText(generateZalgoText("Waytrix"));
           navigation.navigate('OrderScreen', { title: 'Orders Screen' });

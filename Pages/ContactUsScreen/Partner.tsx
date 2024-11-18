@@ -7,21 +7,43 @@ import ipAddress from '../../config';
 const Partner = () => {
   const [partners, setPartners] = useState([]);
 
-  useEffect(() => {
-    AsyncStorage.getItem('tableToken').then(token => {
-        axios.get(`${ipAddress}/api/ContactUsRoutes/GetAllPartners`, {
-            headers: {
-                Authorization: token
+
+    const fetchPartners = async () => {
+      try {
+        // Get restoId and token from AsyncStorage
+        const restoId = await AsyncStorage.getItem('restoId');
+        const token = await AsyncStorage.getItem('tableToken');
+
+        if (restoId && token) {
+          // Make a POST request to fetch partners by restoId
+          const response = await axios.post(
+            `${ipAddress}/api/ContactUsRoutes/getPartnersByRestoId`,
+            { restoId }, // Pass restoId in the request body
+            {
+              headers: {
+                Authorization: token, // Include token in headers
+              },
             }
-        })
-        .then(response => {
-            setPartners(response.data);
-        })
-        .catch(error => {
-            console.error('Error fetching partners:', error);
-        });
-    });
-}, []);
+          );
+          setPartners(response.data); // Update the state with fetched partners
+        } else {
+          console.error('restoId or token not found in AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+      }
+    };
+
+    useEffect(() => {
+      // Fetch partners initially
+      fetchPartners();
+  
+      // Set an interval to fetch partners every 10 seconds
+      const intervalId = setInterval(fetchPartners, 10000); // 10000ms = 10 seconds
+  
+      // Cleanup the interval on component unmount
+      return () => clearInterval(intervalId);
+    }, []); // Empty dependency array means this effect runs only once when the component mounts
 
 
   return (
