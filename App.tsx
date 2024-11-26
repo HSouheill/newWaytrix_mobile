@@ -22,6 +22,7 @@ import ValetLogin from './Pages/Accounts/Valet/ValetLogin'
 import ValetAccountScreen from './Pages/Accounts/Valet/ValetScreen'
 import CarTimer from './Pages/OrderScreen/TimerCar'
 import * as NavigationBar from 'expo-navigation-bar';
+import TimerCar from './Pages/OrderScreen/TimerCar';
 
 
 
@@ -246,7 +247,7 @@ setTableToken(tableToken);
                 component={tableToken ? CarTimer : TableSignIN}
                 options={{
                   header: ({ navigation }) => (
-                    <Header navigation={navigation} title="TIME TO GET YOUR CAR" onPress={onPressScreen} />
+                    <Header navigation={navigation} title="WAIT FOR VALET" onPress={onPressScreen} />
                   ),
                 }}
               />
@@ -380,6 +381,8 @@ setTableToken(tableToken);
           </View>
         </TouchableWithoutFeedback>
       </NavigationContainer>
+      <TimerCar showTimer={true} />  
+
     </View>
   );
 };
@@ -392,14 +395,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#141414',
   },
   header: {
-    paddingTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#8e8a9b',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#8e8a9b',
+    // paddingTop: 25,
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    // backgroundColor: '#8e8a9b',
+    // paddingHorizontal: 15,
+    // paddingVertical: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: '#8e8a9b',
   },
   backButton: {
     marginRight: 10,

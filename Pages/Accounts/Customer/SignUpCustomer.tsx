@@ -317,7 +317,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   button: {
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
+    borderWidth: 1,
+    borderColor: '#fff',
     borderRadius: 5,
     padding: 10,
     width: '100%',
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    color: '#000',
+    color: '#157f44',
     fontSize: 16,
     fontWeight: 'bold',
     fontStyle: 'italic',
@@ -365,10 +367,11 @@ const styles = StyleSheet.create({
     padding: 10,
     width: '30%',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: '#000',
   },
   selectedGender: {
-    backgroundColor: '#555',
+    backgroundColor: '#000',
+    borderColor: '#157f44',
   },
   genderText: {
     color: '#fff',

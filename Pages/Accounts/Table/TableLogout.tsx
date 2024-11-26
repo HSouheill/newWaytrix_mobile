@@ -61,6 +61,7 @@ const TableLogout = () => {
     try {
       const response = await axios.post(`${ipAddress}/api/Auth/login`, userData);
       await AsyncStorage.removeItem('tableToken');
+      await AsyncStorage.removeItem('tableId'); // Add this line to remove tableId
       
       setIsAuthenticated(true);
       navigation.setOptions({

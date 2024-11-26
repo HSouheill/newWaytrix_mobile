@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
     padding: 20,
-    borderColor: '#fff',
+    borderColor: '#5c5c5c',
     borderWidth: 4,
     marginBottom: 60, // FOR FOOTER
   },
@@ -87,11 +87,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     marginBottom: 10,
-    backgroundColor: '#333333',
+    backgroundColor: '#000',
     borderRadius: 10,
-    borderColor: '#fff',
+    borderColor: '#5c5c5c',
     borderWidth: 4,
-    shadowColor: '#fff',
+   // shadowColor: '#fff',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -116,11 +116,11 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   phone: {
-    color: '#b8b8b8',
+    color: '#fff',
     marginBottom: 5,
   },
   description: {
-    color: '#b8b8b8',
+    color: '#fff',
   },
 });
 

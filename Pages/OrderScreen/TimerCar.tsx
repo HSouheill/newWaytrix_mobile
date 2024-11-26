@@ -1,137 +1,128 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import ipAddress from '../../config';
+import * as Progress from 'react-native-progress';
 
-const TimerCar = () => {
-  const [initialMinutes, setInitialMinutes] = useState(0);
-  const [timer, setTimer] = useState(initialMinutes * 60); // Initial timer value in seconds
-  const [minutes, setMinutes] = useState(Math.floor(timer / 60));
-  const [seconds, setSeconds] = useState(timer % 60);
-  const [counting, setCounting] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [buttonDisabled, setButtonDisabled] = useState(true); // Initially disable button
+interface TimerCarProps {
+  showTimer: boolean; // Prop to control the visibility of the timer
+}
 
-  const navigation = useNavigation();
+const TimerCar: React.FC<TimerCarProps> = ({ showTimer }) => {
+  const [timer, setTimer] = useState<number>(0); // Timer value in seconds
+  const [isVisible, setIsVisible] = useState(false);
+  const [totalTime, setTotalTime] = useState<number>(0); // Store the total time for progress calculation
+
+  const backendURL = `${ipAddress}/api/ButtonsRoutes/checkAndActivateCar`;
 
   useEffect(() => {
-    handleStart(); // Start countdown automatically on page load
+    const interval = setInterval(() => {
+      checkAndFetchTimer();
+    }, 10000); // Every 10 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   useEffect(() => {
-    if (counting) {
+    if (timer > 0) {
       const countdown = setInterval(() => {
         setTimer((prevTimer) => {
-          if (prevTimer <= 0) {
+          if (prevTimer <= 1) {
             clearInterval(countdown);
-            setCounting(false); // Stop counting
-            setButtonDisabled(false); // Reactivate button
-            navigation.navigate('Home'); // Navigate to Home route after timer finishes
+            setIsVisible(false); // Hide the component when the timer ends
             return 0;
           }
-          const newTimer = prevTimer - 1;
-          setMinutes(Math.floor(newTimer / 60));
-          setSeconds(newTimer % 60);
-          return newTimer;
+          return prevTimer - 1;
         });
       }, 1000);
 
       return () => clearInterval(countdown);
     }
-  }, [counting]);
+  }, [timer]);
 
-  const handleStart = async () => {
+  const checkAndFetchTimer = async () => {
     try {
-      setLoading(true); // Show loader
-      setButtonDisabled(true); // Disable button
-      const timerId = await AsyncStorage.getItem('timerId');
-      await startCountdown(timerId);
-      setLoading(false); // Hide loader after countdown starts
-    } catch (error) {
-      console.error('Error starting countdown:', error);
-      setLoading(false); // Hide loader on error
-      setButtonDisabled(false); // Reactivate button on error
-    }
-  };
-
-  const startCountdown = async (timerId) => {
-    try {
-      // Fetch tableToken from AsyncStorage
-      const tableToken = await AsyncStorage.getItem('tableToken');
-  
-      const response = await axios.post(
-        `${ipAddress}/api/ButtonsRoutes/get_count_down_valet`,
-        { timerId: timerId },
-        {
-          headers: {
-            Authorization: tableToken,
-          },
-        }
-      );
-  
-      const { timer } = response.data;
-      setTimer(timer * 60); // Convert minutes to seconds for timer countdown
-      setCounting(true);
-    } catch (error) {
-      console.error('Error in initial countdown request:', error);
-      await retryStart(timerId); // Retry the request
-    }
-  };
-
-  const retryStart = async (timerId) => {
-    while (!counting) {
-      try {
-        // Fetch tableToken from AsyncStorage
-        const tableToken = await AsyncStorage.getItem('tableToken');
-  
-        const response = await axios.post(`${ipAddress}/api/ButtonsRoutes/get_count_down_valet`, {
-          timerId: timerId,
-        }, {
-          headers: {
-            Authorization: tableToken,
-          },
-        });
-  
-        const { timer } = response.data;
-        setTimer(timer * 60); // Convert minutes to seconds for timer countdown
-        setCounting(true);
-        break; // Exit loop if successful
-      } catch (error) {
-        console.error('Retry failed:', error);
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds before retrying
+      // Retrieve ticketNum from AsyncStorage
+      const ticketNum = await AsyncStorage.getItem('ticketNum');
+      if (!ticketNum) {
+        return; // Do nothing if ticketNum does not exist
       }
+
+      // Make a POST request with ticketNum
+      const response = await axios.post(backendURL, { ticketNum });
+      const { timeNum } = response.data;
+
+      if (typeof timeNum === 'number' && timeNum > 0) {
+        const timeInSeconds = timeNum * 60; // Convert to seconds
+        setTimer(timeInSeconds);
+        setTotalTime(timeInSeconds); // Set the total time for progress bar calculation
+        setIsVisible(true); // Show the component only when a valid timeNum is returned
+      }
+    } catch (error) {
+      console.error('Error fetching timer:', error);
     }
   };
+
+  const formatTime = (time: number): string => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  if (!isVisible || !showTimer) {
+    return null; // Don't render the component if it's not visible or showTimer is false
+  }
+
+  const progress = totalTime > 0 ? timer / totalTime : 0; // Calculate progress as a fraction
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.timerText, { color: 'white' }]}>
-        {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-      </Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="white" style={styles.loader} />
-      ) : (
-        <Button title="Start Countdown" onPress={handleStart} disabled={counting || buttonDisabled} />
-      )}
+    <View style={styles.popup}>
+      <View style={styles.timerContainer}>
+        <Text style={styles.timerLabel}>Your car arrives in</Text>
+        <Progress.Circle
+          size={80}
+          progress={progress}
+          showsText
+          formatText={() => formatTime(timer)}
+          textStyle={styles.timerText}
+          color="white"
+          thickness={5}
+          borderWidth={2}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  popup: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 1000,
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  timerContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
+  },
+  timerLabel: {
+    color: 'white',
+    fontSize: 16,
+    marginTop: 10,
   },
   timerText: {
-    fontSize: 50,
+    fontSize: 16,
     color: 'white',
-  },
-  loader: {
-    marginTop: 20,
+    fontWeight: 'bold',
   },
 });
 

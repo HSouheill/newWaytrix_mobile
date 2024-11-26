@@ -45,9 +45,14 @@ const ValetScreen = ({ navigation }) => {
   const handleSubmit = async () => {
     try {
       const customerToken = await AsyncStorage.getItem('customerToken');
+      const tableId = await AsyncStorage.getItem('tableId'); // Fetch tableId from AsyncStorage
 
       if (!customerToken) {
         console.error('tableToken not found in AsyncStorage');
+        return;
+      }
+      if (!tableId) {
+        console.error('tableId not found in AsyncStorage');
         return;
       }
 
@@ -57,6 +62,9 @@ const ValetScreen = ({ navigation }) => {
         },
       };
 
+      // Save ticketNum to AsyncStorage
+    await AsyncStorage.setItem('ticketNum', id);
+
       const response = await axios.post(
         `${ipAddress}/api/ButtonsRoutes/AddCar`,
         {
@@ -64,6 +72,7 @@ const ValetScreen = ({ navigation }) => {
           restoId: restoId,
           carName: selectedCarName,
           color: selectedColor,
+          tableId, // Include tableId in the payload
         },
         config
       );
@@ -88,7 +97,7 @@ const ValetScreen = ({ navigation }) => {
     <View style={styles.dropdownContainer}>
       {isVisible && (
         <TextInput
-        style={[styles.input, { color: 'black' }]} // Set inputted text color to black
+        style={[styles.input, { color: 'white' }]} // Set inputted text color to black
           value={searchValue}
           onChangeText={setSearchValue}
           placeholder="Search"
@@ -185,7 +194,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#5c5c5c',
     padding: 20,
   },
   label: {
@@ -198,6 +207,7 @@ const styles = StyleSheet.create({
     width: 400,
     borderColor: '#fff',
     borderWidth: 1,
+    backgroundColor: '#000',
     color: 'white',
     fontWeight:'bold',
     marginBottom: 20,
@@ -217,19 +227,19 @@ const styles = StyleSheet.create({
     width: '100%',
     borderColor: '#fff',
     borderWidth: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     justifyContent: 'center',
     paddingHorizontal: 10,
     marginBottom: 20,
   },
   dropdownButtonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
   },
   dropdownContainer: {
     maxHeight: 150,
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
+    backgroundColor: '#000',
+    borderColor: '#fff',
     borderWidth: 1,
     borderRadius: 5,
   },
@@ -239,18 +249,20 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   dropdownItemText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
   },
   submitButton: {
     marginTop:20,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   submitButtonText: {
-        color: '#000',
+        color: '#157f44',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -130,15 +130,19 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   button: {
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     borderRadius: 5,
     padding: 10,
     width: '100%',
     alignItems: 'center',
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#fff',
+
+   
   },
   buttonText: {
-    color: '#000',
+    color: '#157f44',
     fontSize: 16,
     fontWeight: 'bold',
     fontStyle: 'italic',

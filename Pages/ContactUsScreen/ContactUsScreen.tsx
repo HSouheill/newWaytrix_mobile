@@ -92,30 +92,30 @@ const ContactUsScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.container} >
       <TouchableWithoutFeedback onPress={handlePageClick}>
-        <Text style={styles.label}>NAME</Text>
+        {/* <Text style={styles.label}>NAME</Text> */}
         <TextInput
           style={styles.input}
           placeholder="ENTER YOUR NAME"
-          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
+          placeholderTextColor="#fff" // Optional: Placeholder color
           value={name}
           onChangeText={setName}
         />
 
-        <Text style={styles.label}>PHONE</Text>
+        {/* <Text style={styles.label}>PHONE</Text> */}
         <TextInput
           style={styles.input}
           placeholder="ENTER YOUR PHONE NUMBER"
-          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
+          placeholderTextColor="#fff" // Optional: Placeholder color
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
         />
 
-        <Text style={styles.label}>TEXT</Text>
+        {/* <Text style={styles.label}>TEXT</Text> */}
         <TextInput
           style={[styles.input, styles.textInput]}
           placeholder="ENTER YOUR MESSAGE"
-          placeholderTextColor="#b8b8b8" // Optional: Placeholder color
+          placeholderTextColor="#fff" // Optional: Placeholder color
           value={text}
           onChangeText={setText}
           multiline
@@ -147,7 +147,7 @@ const ContactUsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#757575',
     padding: 20,
   },
   label: {
@@ -157,9 +157,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    borderColor: '#fff',
+    borderColor: '#5c5c5c',
     borderWidth: 4,
-    backgroundColor: '#333333', // Dark background
+    backgroundColor: '#000', // Dark background
     color: '#b8b8b8', // Text color inside input
     fontWeight: 'bold',
     borderRadius: 5,
@@ -172,15 +172,15 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   submitButton: {
-    backgroundColor: '#8e8a9b',
+    backgroundColor: '#000',
     borderRadius: 4,
-    borderColor: '#fff',
+    borderColor: '#5c5c5c',
     borderWidth: 4,
     padding: 15,
     alignItems: 'center',
   },
   submitText: {
-    color: 'white',
+    color: '#157f44',
     fontSize: 18,
     fontWeight: 'bold',
     textTransform: 'uppercase',  // This forces the text to be capitalized

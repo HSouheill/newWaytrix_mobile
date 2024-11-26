@@ -183,7 +183,7 @@ export default function SettingsScreen({ navigation }) {
         source={{ uri: 'http://74.208.98.3:3030/uploads/image-1719996835746.svg' }}
         style={{width:250, height:250,backgroundColor: 'white', borderColor: 'black', borderWidth: 1 }}
       /> */}
-      <Text style={styles.label}>Request: </Text>
+      <Text style={styles.label}>REQUEST: </Text>
       
 
       <ScrollView contentContainerStyle={styles.buttonContainer} showsVerticalScrollIndicator={false}>
@@ -299,13 +299,13 @@ const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#8e8a9b',
+    backgroundColor: '#000',
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
     width: '30%', // Adjust width for better responsiveness
     borderWidth: 4,
-    borderColor: '#fff',
+    borderColor: '#5c5c5c',
   },
   icon: {
     width: 50,
@@ -342,18 +342,21 @@ const styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#757575',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
     marginBottom: 50, // FOR FOOTER
   },
   label: {
-    color: '#fff',
+    color: '#157f44',
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+    textShadowColor: 'black',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   webView: {
     width: 50,
@@ -376,14 +379,14 @@ const styles = StyleSheet.create({
   },
   bigButton: {
     flex: 1,
-    backgroundColor: '#8e8a9b',
+    backgroundColor: '#000',
     paddingVertical: 20,
     marginHorizontal: 10,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,  // Add this
-    borderColor: '#fff',  // Add this
+    borderColor: '#5c5c5c',  // Add this
   },
   bigButtonText: {
     color: '#fff',
