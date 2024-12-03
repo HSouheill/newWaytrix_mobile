@@ -17,10 +17,11 @@ const SignIn = () => {
       alert('Password must be at least 8 characters');
       return;
     }
+  
     const userData = {
       email,
       password,
-      role: "customer"
+      role: "customer",
     };
   
     try {
@@ -39,11 +40,11 @@ const SignIn = () => {
       setTimeout(async () => {
         await logoutUser();
       }, 200000);
-  
     } catch (error) {
       console.error('Error signing in:', error);
+      alert('Login failed. Please check your Email and Password.');
     }
-  };
+  };  
   
   // Function to increment totalTimesSigned
   const incrementTotalTimesSigned = async (userId) => {

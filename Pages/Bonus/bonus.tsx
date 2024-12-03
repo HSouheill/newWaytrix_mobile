@@ -147,9 +147,8 @@ const SpinAndWin = () => {
     >
       {/* Greeting Text */}
       <Text style={styles.greetingText}>
-        Hello, {customerName}. Number of spins remaining today is {lastTimeSpinned}
+        Hello, {customerName ? customerName.charAt(0).toUpperCase() + customerName.slice(1) : ''}. Number of spins remaining today is {lastTimeSpinned}
       </Text>
-
       {/* Wheel Component */}
       <Wheel segments={segments} onEnd={handleWheelEnd} onSpin={handleOnSpin} />
       <TouchableOpacity

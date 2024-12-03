@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert } from 'react-native';
+import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert, TouchableWithoutFeedback  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ipAddress from '../config';
@@ -101,6 +101,8 @@ const SurveyScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+          <TouchableWithoutFeedback>
+          <View style={{ flex: 1 }}>
       <View style={styles.questionContainer}>
         {/* <Text style={styles.label}>Name:</Text> */}
         <TextInput
@@ -419,6 +421,8 @@ const SurveyScreen = ({ navigation }) => {
       <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
+      </View>
+      </TouchableWithoutFeedback>
     </ScrollView>
   );
 };

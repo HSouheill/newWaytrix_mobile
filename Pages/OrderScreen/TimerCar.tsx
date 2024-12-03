@@ -60,7 +60,7 @@ const TimerCar: React.FC<TimerCarProps> = ({ showTimer }) => {
         setIsVisible(true); // Show the component only when a valid timeNum is returned
       }
     } catch (error) {
-      console.error('Error fetching timer:', error);
+     // console.error('Error fetching timer:', error);
     }
   };
 

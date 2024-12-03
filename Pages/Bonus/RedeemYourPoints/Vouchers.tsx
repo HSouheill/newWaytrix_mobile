@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, Alert, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -75,6 +75,7 @@ const Vouchers = () => {
   };
 
   const renderVoucherCard = ({ item }) => (
+    <TouchableWithoutFeedback>
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: item.image }} style={styles.cardImage} />
@@ -91,6 +92,7 @@ const Vouchers = () => {
         </TouchableOpacity>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 
   if (loading) {
@@ -102,6 +104,7 @@ const Vouchers = () => {
   }
 
   return (
+    <TouchableWithoutFeedback>
     <View style={styles.container}>
       <FlatList
         data={vouchers}
@@ -138,6 +141,7 @@ const Vouchers = () => {
         </View>
       </Modal>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 

@@ -78,12 +78,20 @@ const ValetScreen = ({ navigation }) => {
       );
 
       setTimeout(async () => {
-        console.log("wait")
+        console.log("wait");
         const { timerId } = response.data;
         await AsyncStorage.setItem('timerId', timerId);
       }, 2000);
 
       setModalVisible(true);
+  
+      // Reset the form fields here
+      setId('');
+      setSelectedCarName('');
+      setSelectedColor('');
+      setCarNameSearch('');
+      setColorSearch('');
+  
       setTimeout(() => {
         setModalVisible(false);
         navigation.navigate('CarTimer');
@@ -134,6 +142,7 @@ const ValetScreen = ({ navigation }) => {
           onChangeText={setId}
           placeholder="Enter Card Number"
           placeholderTextColor="#ccc"
+          keyboardType="numeric" // Shows number-only keyboard
         />
 
         <View style={styles.rowContainer}>
@@ -175,7 +184,7 @@ const ValetScreen = ({ navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Car requested successfully!</Text>
+              <Text style={styles.modalText}>Request received! The valet will soon share your waiting time.</Text>
             </View>
           </View>
         </Modal>

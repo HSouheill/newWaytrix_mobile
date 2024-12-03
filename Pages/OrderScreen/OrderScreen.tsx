@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef  } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Image } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Image, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons'; // Assuming Ionicons is used for icons
@@ -187,6 +187,7 @@ export default function SettingsScreen({ navigation }) {
       
 
       <ScrollView contentContainerStyle={styles.buttonContainer} showsVerticalScrollIndicator={false}>
+      <TouchableWithoutFeedback>
   <View style={styles.buttonRow}>
     {napkins && (
       <TouchableOpacity 
@@ -265,6 +266,7 @@ export default function SettingsScreen({ navigation }) {
       </TouchableOpacity>
     ))}
   </View>
+  </TouchableWithoutFeedback>
 </ScrollView>
  
       <Modal
