@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Image } from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -32,7 +32,7 @@ const SpinControl: React.FC<SpinControlProps> = ({
     };
   });
   return (
-    <Svg width={SCREEN_WIDTH} height={180} style={[styles.outerSvg, { marginBottom: 15 }]}>
+    <Svg width={SCREEN_WIDTH} height={230} style={[styles.outerSvg, { marginBottom: 15 }]}>
       <Defs>
         <LinearGradient id="spinGradient" x1="0" y1="0" x2="0" y2="100%">
           <Stop offset="0%" stopColor="#BD7A2A" stopOpacity="1" />
@@ -41,22 +41,27 @@ const SpinControl: React.FC<SpinControlProps> = ({
       </Defs>
       {/* <Path d={bowPath} stroke="#FFC300" strokeWidth={8} fill="none" /> */}
       <G>
-        <Path d={daggerPath} stroke="#FFC300" strokeWidth={6} fill="#FFC300" transform={[{ scaleY: 1.4 }]}/>
-        <Circle cx={SCREEN_WIDTH / 2} cy="124" r="55" fill="#B8783C" />
+        
+        <Image source={require("../../../assets/spin_Arrow.png")} style={{ width: 200, height: 200, position: 'absolute', top: 0, left: 200, resizeMode: 'contain' }}></Image>
+        {/* <Path d={daggerPath} stroke="#FFC300" strokeWidth={6} fill="#FFC300" transform={[{ scaleY: 1.4 }]}/> */}
+        <Circle cx={SCREEN_WIDTH / 2} cy="126" r="66" fill="#FFFFFF33" />
+        <Circle  cx={SCREEN_WIDTH / 2} cy="114" r="66" fill="#FFEC4233"  />
+
         <AnimatedCircle
           onPress={onSpin}
           cx={SCREEN_WIDTH / 2}
           animatedProps={animatedCircleProps}
-          r="55"
-          fill="#FFC300" // colors HERE ANDD on lines 42, 44, and 38 and 39 for text
+          r="66"
+          fill="#1A1C20" // colors HERE ANDD on lines 42, 44, and 38 and 39 for text
         />
         <SText
           x={SCREEN_WIDTH / 2}
           y="130"
           textAnchor="middle"
-          fontSize="36"
+          fontSize="30"
           fontWeight="bolder"
-          fill="url(#spinGradient)"
+          fill="white"
+
         >
           SPIN
         </SText>
@@ -70,7 +75,9 @@ export default SpinControl;
 const styles = StyleSheet.create({
   outerSvg: {
     position: "absolute",
-    bottom: "32%",
+    bottom: "27%",
+    height: '100%',
     zIndex: 2,
+    resizeMode: "contain",
   },
 });

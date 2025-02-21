@@ -1,101 +1,99 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import ipAddress from '../../../config';
+import { LinearGradient } from 'expo-linear-gradient';
+import Change_password from './Change_password';
+import ResetPass from './ResetPass';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+
+type RootStackParamList = {
+  ForgotPass: undefined;
+  ResetPass: { 
+    email: string; 
+    token?: string  // Make token optional
+  };
+  Change_password: { 
+    email: string; 
+    resetToken: string 
+  };
+};
+
+// When navigating
+
+
+type ForgotPassNavigationProp = StackNavigationProp<RootStackParamList, 'ForgotPass'>;
+
 const ForgotPass = () => {
   const [email, setEmail] = useState('');
   const [showEmailInput, setShowEmailInput] = useState(true);
   const [showNewInputs, setShowNewInputs] = useState(false);
   const [forgotKey, setForgotKey] = useState('');
   const [password, setPassword] = useState('');
-
-  const handleEmailSubmit = async () => {
-    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
-        alert('Please enter a valid email');
-        return;
-      }
-      
-     
-    try {
-      const response = await axios.post(`${ipAddress}/api/Auth/generateForgotKey`, {
-        email: email
-      });
-      console.log('Email:', email);
-      setShowEmailInput(false);
-      setShowNewInputs(true);
-    } catch (error) {
-      console.error('Error submitting email:', error);
+  // const navigation = useNavigation();
+  const navigation = useNavigation<ForgotPassNavigationProp>();
+  
+  const handleSubmit = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      alert('Please enter your email.');
+      return;
     }
-  };
-  const navigation = useNavigation();
-
-  const handleNewInputsSubmit = async () => {
-    if (password.trim().length < 8) {
-        alert('Password must be at least 8 characters');
-        return;
-      }
-
+    
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+  
     try {
-      const response = await axios.post(`${ipAddress}/api/Auth/updatePassword`, {
-        email: email,
-        forgotKey: Number(forgotKey),
-        password: password
+      const otpResponse = await axios.post(`${ipAddress}/api/auth/forgotpassword`, { 
+        email 
       });
-      navigation.navigate('BonusScreen')
-      console.log('Email:', email);
-      console.log('Password:', password);
-      console.log('Forgot Key:', forgotKey);
-    } catch (error) {
-      console.error('Error updating password:', error);
+      
+      navigation.navigate('ResetPass', { 
+        email: email 
+      });
+    } catch (error) { 
+      console.error('Full error:', error);
+      alert(
+        error.response?.data?.message || 
+        `Failed to send OTP. ${error.message}`
+      );
     }
   };
 
   return (
+        <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
     <View style={styles.container}>
-      {showEmailInput && (
-        <>
-          <Text style={styles.title}>Enter your email:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            keyboardType="email-address"
-            placeholderTextColor="white"
-          />
-          <TouchableOpacity style={styles.button} onPress={handleEmailSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
+      <Text style={styles.title}>Reset Password</Text>
+      <Image source={require('../../../assets/forgot-password 2.png')} style={styles.image1}/>
+      <Text style={styles.description}>Enter the email address associated with your account.</Text>
+      <View style={styles.formcontainer}>
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput
+                  placeholder="Write here"
+                  value={email}
+                  onChangeText={setEmail}
+                  style={styles.input}
+                  placeholderTextColor="#CCCCCC"
+                  />
+      </View>
 
-      {showNewInputs && (
-        <>
-          <Text style={styles.title}>Enter your new password:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="New Password"
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry
-            placeholderTextColor="white"
-          />
-          <Text style={styles.title}>Check your email for the key:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Forgot Key"
-            onChangeText={(text) => setForgotKey(text)}
-            value={forgotKey}
-            placeholderTextColor="white"
-            keyboardType="numeric"
-          />
-          <TouchableOpacity style={styles.button} onPress={handleNewInputsSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        </>
-      )}
+       <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                <LinearGradient
+                  colors={['#3F63CB', '#679BFF']}
+                  style={styles.button}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.buttonText}>Send</Text>
+                </LinearGradient>
+              </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
 };
 
@@ -104,36 +102,86 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: 'black',
+    top: '-8%',
+    // paddingHorizontal: 20,
+    // backgroundColor: 'black',
+  },
+  backgroundContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: '-10%',
+  },
+  image: {
+    width: 90,
+    height: 90,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  image1: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    marginTop: 20,
+    // top: '-10%',
   },
   title: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 10,
     color: 'white',
+    width: 559,
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: 'white',
+    width: 400,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  formcontainer: {
+    width:  380,
+  },
+  label: {
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+    color: '#FFFFFF',
+    fontSize: 16,
   },
   input: {
-    borderWidth: 1,
-    borderColor: 'white',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
     width: '100%',
-    color: 'white',
+    marginVertical: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    borderRadius: 12,
+    // color: '#FFFFFF',
+    fontSize: 16,
+    backgroundColor: '#FFFFFF',  // Set background color to white
+    color: '#000000',   
+  },
+  buttonContainer: {
+    width: 150,
+    height: 40,
+    borderRadius: 99,
+    overflow: 'hidden', // Ensures the gradient does not spill outside the border radius
+    marginTop: 10,
   },
   button: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 99, // Ensure that the gradient follows this border radius
   },
   buttonText: {
-    color: 'black',
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: 'bold',
-  },
+  }
 });
 
 export default ForgotPass;

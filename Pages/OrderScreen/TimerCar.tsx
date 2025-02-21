@@ -79,14 +79,14 @@ const TimerCar: React.FC<TimerCarProps> = ({ showTimer }) => {
   return (
     <View style={styles.popup}>
       <View style={styles.timerContainer}>
-        <Text style={styles.timerLabel}>Your car arrives in</Text>
+        <Text style={styles.timerLabel}>Your car will be ready in:</Text>
         <Progress.Circle
           size={80}
           progress={progress}
           showsText
           formatText={() => formatTime(timer)}
           textStyle={styles.timerText}
-          color="white"
+          color="#3F63CB"
           thickness={5}
           borderWidth={2}
         />

@@ -4,13 +4,37 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import ipAddress from '../../../config';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Vouchers = () => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [itemmodalVisible, setItemModalVisible] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [userPoints, setUserPoints] = useState(0);
+
+  const fetchUserPoints = async () => {
+    try {
+      const customerToken = await AsyncStorage.getItem('customerToken');
+      const customerId = await AsyncStorage.getItem('customerId');
+      if (customerToken && customerId) {
+        const response = await axios.post(
+          `${ipAddress}/api/ContactUsRoutes/getTotalPoints`,
+          { customerId },
+          {
+            headers: { Authorization: customerToken }
+          }
+        );
+        if (response.data && response.data.length > 0) {
+          setUserPoints(response.data[0].points);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user points:', error);
+    }
+  };
 
   const fetchVouchers = async () => {
     try {
@@ -28,7 +52,13 @@ const Vouchers = () => {
         }
       );
 
-      setVouchers(response.data);
+      const transformedData = response.data.map(voucher => ({
+        ...voucher,
+        category: voucher.category || 'Uncategorized',
+        discount: voucher.discount || '20'
+      }));
+
+      setVouchers(transformedData);
     } catch (error) {
       console.error('Error fetching vouchers:', error);
     } finally {
@@ -38,11 +68,28 @@ const Vouchers = () => {
 
   useEffect(() => {
     fetchVouchers();
-    const interval = setInterval(fetchVouchers, 5000);
+    fetchUserPoints();
+    const interval = setInterval(() => {
+      fetchVouchers();
+      fetchUserPoints();
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const redeemVoucher = async (voucherId) => {
+  const handleRedeemClick = (voucher) => {
+    if (userPoints < voucher.pointsCost) {
+      setErrorModal(true);
+      setTimeout(() => setErrorModal(false), 3000);
+      return;
+    }
+    setSelectedVoucher(voucher);
+    setModalVisible(true);
+  };
+
+
+  const handleConfirmRedeem = async () => {
+    if (!selectedVoucher) return;
+    
     try {
       const customerToken = await AsyncStorage.getItem('customerToken');
       const customerId = await AsyncStorage.getItem('customerId');
@@ -51,9 +98,10 @@ const Vouchers = () => {
       const response = await axios.post(
         `${ipAddress}/api/ContactUsRoutes/Redeem`,
         {
-          _id: voucherId,
+          _id: selectedVoucher._id,
           customerId,
-          restoId
+          restoId,
+          pointsCost: selectedVoucher.pointsCost
         },
         {
           headers: {
@@ -62,11 +110,11 @@ const Vouchers = () => {
         }
       );
 
-      console.log('Voucher redeemed:', response.data);
-      setModalVisible(true);
-      setTimeout(() => {
-        setModalVisible(false);
-      }, 3000);
+      // Update local points state after successful redemption
+      setUserPoints(prevPoints => prevPoints - selectedVoucher.pointsCost);
+      setModalVisible(false);
+      setItemModalVisible(true);
+      fetchUserPoints(); // Refresh points from server
     } catch (error) {
       console.error('Error redeeming voucher:', error);
       setErrorModal(true);
@@ -74,25 +122,57 @@ const Vouchers = () => {
     }
   };
 
-  const renderVoucherCard = ({ item }) => (
-    <TouchableWithoutFeedback>
-    <View style={styles.card}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: item.image }} style={styles.cardImage} />
+  const renderCategoryHeader = (title) => (
+    <View style={styles.categoryHeader}>
+      <Text style={styles.categoryTitle}>{title}</Text>
+    </View>
+  );
+
+  const renderVoucherGrid = ({ item }) => (
+    <View style={styles.cardWrapper}>
+      <View style={styles.card}>
+        <View style={styles.discountBadge}>
+          <Text style={styles.discountText}>{item.discount}% Off</Text>
+        </View>
+        <View style={styles.logoContainer}>
+          <Image source={{ uri: item.image }} style={styles.logo} />
+        </View>
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.cardText}>{item.name}</Text>
-        <Text style={styles.cardText}>{item.pointsCost} points</Text>
-        <Text style={styles.cardDescription}>{item.description}</Text>
-        <TouchableOpacity
-          style={styles.redeemButton}
-          onPress={() => redeemVoucher(item._id)}
+      <TouchableOpacity
+        style={[
+          styles.redeemButton,
+          userPoints < item.pointsCost && styles.disabledButton
+        ]}
+        onPress={() => handleRedeemClick(item)}
+        disabled={userPoints < item.pointsCost}
+      >
+        <LinearGradient
+          colors={userPoints < item.pointsCost ? ['#666666', '#999999'] : ['#3F63CB', '#679BFF']}
+          style={styles.button}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.redeemText}>Redeem</Text>
-        </TouchableOpacity>
+          <Text style={styles.redeemText}>
+            {userPoints < item.pointsCost 
+              ? `Need ${item.pointsCost - userPoints} more points` 
+              : `Redeem For ${item.pointsCost} Points`}
+          </Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderCategory = (category, items) => (
+    <View style={styles.categorySection}>
+      {renderCategoryHeader(category)}
+      <View style={styles.gridContainer}>
+        {items.map((item, index) => (
+          <View key={item._id || index} style={styles.gridItem}>
+            {renderVoucherGrid({ item })}
+          </View>
+        ))}
       </View>
     </View>
-    </TouchableWithoutFeedback>
   );
 
   if (loading) {
@@ -103,44 +183,125 @@ const Vouchers = () => {
     );
   }
 
+  const groupedVouchers = vouchers.reduce((acc, voucher) => {
+    if (!acc[voucher.category]) {
+      acc[voucher.category] = [];
+    }
+    acc[voucher.category].push(voucher);
+    return acc;
+  }, {});
+
   return (
     <TouchableWithoutFeedback>
-    <View style={styles.container}>
-      <FlatList
-        data={vouchers}
-        renderItem={renderVoucherCard}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.flatListContent}
-      />
+      <View style={styles.container}>
+        {Object.entries(groupedVouchers).map(([category, items]) => 
+          renderCategory(category, items)
+        )}
 
-      {/* Success Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Redeemed Successfully!{'\n'}Check Your Email</Text>
-          </View>
-        </View>
-      </Modal>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            
+            <LinearGradient
+                        colors={['#000000', '#003266']}
+                        style={styles.linearContent}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
 
-      {/* Error Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={errorModal}
-        onRequestClose={() => setErrorModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Failed to Redeem Voucher!{'\n'}Check Your Points</Text>
+<TouchableOpacity 
+                          style={styles.closeButton} 
+                          onPress={() => setModalVisible(false)}
+                        >
+                          <Text style={styles.closeButtonText}>✕</Text>
+                        </TouchableOpacity>
+
+            <View style={styles.modalContent}>
+            
+              <Text style={styles.modalText}>
+              Are you sure do you want to redeem this voucher?</Text>
+              <View style={styles.modalButtons}>
+                
+                <TouchableOpacity onPress={handleConfirmRedeem}>
+                  <LinearGradient
+                    colors={['#3F63CB', '#679BFF']}
+                    style={styles.acceptbutton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.accepttext}>Redeem Voucher</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+            </LinearGradient>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={errorModal}
+          onRequestClose={() => setErrorModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>
+                Insufficient points to redeem this voucher!
+              </Text>
+            </View>
+          </View>
+          
+        </Modal>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={itemmodalVisible}
+          onRequestClose={() => setItemModalVisible(false)}
+        >
+          <View style={styles.modalBackground}>
+            <LinearGradient
+              colors={['#000000', '#003266']}
+              style={styles.modalContent}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              <TouchableOpacity 
+                style={styles.closeButton} 
+                onPress={() => setItemModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+              
+              <Text style={styles.modalTitle}>Voucher</Text>
+              
+              {selectedVoucher && (
+                <View style={styles.partnerDetails}>
+                  <Image 
+                    source={{ uri: selectedVoucher.image }}
+                    style={styles.modalLogo}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.detailsContainer}>
+                    <Text style={styles.detailLabel}>Brand's Name: 
+                      <Text style={styles.detailText}> {selectedVoucher.name}</Text>
+                    </Text>
+                    
+                    <Text style={styles.detailLabel}>Description: 
+                      <Text style={styles.detailText}> {selectedVoucher.description}</Text>
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </LinearGradient>
+          </View>
+        </Modal>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -148,139 +309,204 @@ const Vouchers = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    padding: 10,
+  },
+  categorySection: {
+    marginBottom: 24,
+  },
+  categoryHeader: {
+    marginBottom: 16,
+  },
+  categoryTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 5,
+  },
+  cardWrapper: {
+    alignItems: 'center',
+  },
+  gridItem: {
+    width: '30%',
+    marginBottom: 16,
   },
   card: {
-    flexDirection: 'row',
-    backgroundColor: '#222',
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    width: '100%',
+    backgroundColor: 'rgba(49, 49, 49, 0.4)',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 6,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    position: 'relative',
+
   },
-  imageContainer: {
-    height: 100,
-    width: 100,
-    borderRadius: 50,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 20,
+  discountBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF5353B2',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  textContainer: {
-    flex: 1,
-  },
-  cardText: {
+  discountText: {      
     color: '#fff',
-    fontSize: 15,
+    fontSize: 10,
     fontWeight: 'bold',
-    marginBottom: 5,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
-  cardDescription: {
-    color: '#fff',
-    fontSize: 14,
-    marginBottom: 5,
-    lineHeight: 20,
+  logoContainer: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  cardImage: {
+  logo: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 50,
+    resizeMode: 'contain',
   },
-  redeemButton: {
-    backgroundColor: '#444',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  redeemText: {
+  brandName: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    textTransform: 'uppercase',
+    marginBottom: 12,
     textAlign: 'center',
   },
-  flatListContent: {
-    flexGrow: 1,
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8,
+
+  },
+  redeemButton: {
+    borderRadius: 8,
+    width: "100%",
+    overflow: 'hidden', // Ensures the gradient does not spill outside the border radius
+    
+  },
+  redeemText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(211, 211, 211, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    borderWidth: 1,
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#111',
-    borderColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    // backgroundColor: '#1E2A45',
+    padding: 24,
+    borderRadius: 12,
     alignItems: 'center',
   },
   modalText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    textTransform: 'uppercase',
+    textAlign: 'center',
   },
-  formModalContainer: {
-    flex: 1,
-    
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  acceptbutton: {
+    marginTop:20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
+    width: "100%",
   },
-  formModalContent: {
-    backgroundColor: '#111',
-    borderWidth:2,
-    borderColor:'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  input: {
-    backgroundColor: '#333',
-    color: '#fff',
-    borderWidth:2,
-    borderColor:'gray',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  requestSMSButton: {
-    backgroundColor: '#444',
-    borderWidth:2,
-    borderColor:'gray',
-    paddingVertical: 12,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  requestSMSText: {
+  accepttext: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-    textTransform: 'uppercase',
+  },
+  disabledButton: {
+    opacity: 0.7,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 10,
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fff',
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 15,
+    top: 5,
+    zIndex: 1,
+    // marginBottom: 40
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  linearContent: {
+    width: '100%',
+    maxWidth: 300,
+    borderRadius: 20,
+    padding: 10,
+    alignItems: 'center',
+
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 25,
+    textAlign: 'center',
+  },
+  modalLogo: {
+    width: 250,
+    height: 150,
+    resizeMode: 'contain',
+    marginBottom: 25,
+  },
+  partnerDetails: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  detailsContainer: {
+    width: '100%',
+    gap: 15,
+  },
+  detailLabel: {
+    color: '#CCCCCC',
+    fontSize: 14,
+  },
+  detailText: {
+    color: 'white',
+    fontSize: 14,
   },
 });
 

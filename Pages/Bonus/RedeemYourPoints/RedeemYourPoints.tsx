@@ -1,116 +1,174 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView, Platform, StatusBar, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import VouchersPage from './Vouchers';
+import Vouchers from './Vouchers';
 import ipAddress from '../../../config';
+import { LinearGradient } from 'expo-linear-gradient';
+import CustomHeader from '../../../layout/CustomHeader';
 
-const RedeemYourPoints = ({ navigation }) => {
+const RedeemYourPoints = () => {
   const [totalPoints, setTotalPoints] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [customerName, setCustomerName] = useState("");
+
+
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      const customerToken = await AsyncStorage.getItem("customerToken");
+      const customerId = await AsyncStorage.getItem("customerId");
+
+      if (customerToken && customerId) {
+        try {
+          const response = await axios.post(
+            `${ipAddress}/api/ContactUsRoutes/getCustomerSpinDate`,
+            { customerId },
+            {
+              headers: { authorization: `${customerToken}` },
+            }
+          );
+
+          if (response.status === 200) {
+            setCustomerName(response.data.name);
+            console.log("Customer Name:", response.data.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch customer data", error);
+        }
+      }
+    };
+
+    // Fetch once immediately on mount
+    fetchCustomerData();
+    // Set up polling every 5 seconds
+ const intervalId = setInterval(fetchCustomerData, 5000);
+ return () => {
+   clearInterval(intervalId);
+   // eventSource.close();
+ };
+}, []);
+
+
 
   const fetchPoints = async () => {
     try {
       const customerToken = await AsyncStorage.getItem('customerToken');
       const customerId = await AsyncStorage.getItem('customerId');
       if (customerToken && customerId) {
-        const headers = {
-          Authorization: customerToken,
-        };
-        const response = await axios.post(`${ipAddress}/api/ContactUsRoutes/getTotalPoints`, { customerId }, { headers });
-        if (response.data && response.data.length > 0) {
-          setTotalPoints(response.data[0].points);
-        } else {
-          setTotalPoints(0);
-        }
+        const headers = { Authorization: customerToken };
+        const response = await axios.post(
+          `${ipAddress}/api/ContactUsRoutes/getTotalPoints`,
+          { customerId },
+          { headers }
+        );
+        setTotalPoints(response.data?.[0]?.points ?? 0);
+        setCustomerName(response.data.name);
+
       }
     } catch (error) {
       console.error('Error fetching points:', error);
+      setTotalPoints(0);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPoints(); // Initial fetch
-    const intervalId = setInterval(fetchPoints, 3000); // Fetch every 3 seconds
+  
 
-    return () => {
-      clearInterval(intervalId); // Cleanup
-    };
+  useEffect(() => {
+    fetchPoints();
+    const intervalId = setInterval(fetchPoints, 300000);
+    return () => clearInterval(intervalId);
   }, []);
 
+
+
   return (
-    <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#ffffff" />
-      ) : (
-        <View style={styles.pointsContainer}>
-          <Text style={styles.pointsLabel}>Your Total Balance:</Text>
-          <View style={styles.pointsBox}>
-            <Text style={styles.pointsText}>{totalPoints}</Text>
+     <TouchableWithoutFeedback>
+    <SafeAreaView style={styles.safeArea}>
+    <LinearGradient
+      colors={['#3F63CB', '#003266', '#000000']}
+      style={styles.gradient}
+    >
+
+      <View style={styles.top}>
+      < CustomHeader username={customerName} />
+      <View style={styles.content}>
+        
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#ffffff" />
+        ) : (
+          <View style={styles.header}>
+            <Text style={styles.title}>Redeem Points</Text>
+            <View style={styles.pointsBox}>
+              <Text style={styles.pointsText}>{totalPoints} Points Available</Text>
+            </View>
           </View>
-        </View>
-      )}
+        )}
+              <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
-      <VouchersPage />
+        <Vouchers />
+      </ScrollView>
+      </View>
+      </View>
 
-      {/* Go Back Button */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>Go Back</Text>
-      </TouchableOpacity>
-    </View>
+    </LinearGradient>
+  </SafeAreaView>
+   </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  contentContainer: {
+    flexGrow: 1,
+  },
+  safeArea: {
     flex: 1,
-    backgroundColor: '#121212',
-    padding: 20,
+    // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     marginBottom: 50,
   },
-  pointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
+  content: {
+    flex: 1,
+    top: "7%",
+    // paddingHorizontal: 16,
   },
-  pointsLabel: {
-    fontSize: 18,
+  top:{
+    flex: 1,
+    top: "2%",
+  },
+  gradient: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+    marginBottom: 100,
+  },
+  header: {
+    // marginTop: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
     color: '#ffffff',
-    marginRight: 10,
+    marginBottom: 12,
   },
   pointsBox: {
-    backgroundColor: '#1f1f1f',
-    borderRadius: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderColor: '#ffffff',
-    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 80,
+    padding: 10,
   },
   pointsText: {
-    fontSize: 18,
-    color: '#ffffff',
-  },
-  backButton: {
-    backgroundColor: '#222',
-    padding: 10,
-    borderRadius: 5,
-    borderColor: '#ffffff',
-    borderWidth: 1,
-    marginTop: 5,
-    alignItems: 'center',
-    bottom: 5,
-    position: 'relative',
-  },
-  backButtonText: {
-    color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });
 

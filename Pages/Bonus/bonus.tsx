@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Alert, Text, TouchableOpacity, Animated, View } from "react-native";
+import { StyleSheet, Alert, Text, TouchableOpacity, Animated, View, ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Wheel from "./components/Wheel";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,8 +15,13 @@ import {
 import WalletView from "./components/WalletView";
 import { useNavigation } from "@react-navigation/native";
 import ipAddress from "../../config";
+import BonusWheelHeader from '../../layout/BonusWheelHeader'
+import PointsModal from './PointsModal'; 
 
-const segments = [1, 3, 7, 5, 10, 15, 20];
+
+
+
+const segments = ["1 ", "9 ", "6 ", "2", "10 ", "4 "];
 const initialBalance = 1.7;
 
 const SpinAndWin = () => {
@@ -28,11 +33,12 @@ const SpinAndWin = () => {
   const [showModal, setShowModal] = useState(false);
   const [wonPoints, setWonPoints] = useState(0);
   const [showErrorModal, setShowErrorModal] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState("");
    // State to store customer data
    const [customerName, setCustomerName] = useState("");
    const [lastTimeSpinned, setLastTimeSpinned] = useState("");
- 
+   
+   // Fetch customer data
    useEffect(() => {
      const fetchCustomerData = async () => {
        const customerToken = await AsyncStorage.getItem("customerToken");
@@ -51,6 +57,7 @@ const SpinAndWin = () => {
            if (response.status === 200) {
              setCustomerName(response.data.name);
              setLastTimeSpinned(response.data.lastTimeSpinned);
+             console.log("Customer Name:", response.data.name);
            }
          } catch (error) {
            console.error("Failed to fetch customer data", error);
@@ -60,6 +67,7 @@ const SpinAndWin = () => {
  
      // Fetch once immediately on mount
      fetchCustomerData();
+
      // Set up polling every 5 seconds
   const intervalId = setInterval(fetchCustomerData, 5000);
 
@@ -106,9 +114,7 @@ const SpinAndWin = () => {
             setShowModal(false);
           }, 5000);
         }
-      } else {
-        alert("Error", "Customer token not found.");
-      }
+      } 
     } catch (error) {
       setShowErrorModal(true);
       setTimeout(() => {
@@ -141,24 +147,51 @@ const SpinAndWin = () => {
   });
 
   return (
-    <LinearGradient
-      style={[styles.container, { paddingTop: insets.top }]}
-      colors={["#fff", "#312e2e"]}
-    >
+    // <LinearGradient
+    //   style={[styles.container, { paddingTop: insets.top }]}
+    //   colors={["#fff", "#312e2e"]}
+    // >
+      <ImageBackground source={require('../../assets/Sparkles_Image.png')} style={styles.backgroundContainer}>
+
+     <View style={styles.container}>
+     <BonusWheelHeader username={customerName}/>
       {/* Greeting Text */}
       <Text style={styles.greetingText}>
-        Hello, {customerName ? customerName.charAt(0).toUpperCase() + customerName.slice(1) : ''}. Number of spins remaining today is {lastTimeSpinned}
+        Hello {customerName ? customerName.charAt(0).toUpperCase() + customerName.slice(1) : ''}, you have {lastTimeSpinned} spin available
       </Text>
+
+      <Text style={styles.title}>Spin and Win!</Text>
       {/* Wheel Component */}
-      <Wheel segments={segments} onEnd={handleWheelEnd} onSpin={handleOnSpin} />
-      <TouchableOpacity
+      <Wheel segments={segments} onEnd={handleWheelEnd} onSpin={handleOnSpin}  />
+
+       {/* <TouchableOpacity
         style={styles.homeButton}
         onPress={() => navigation.navigate("RedeemPage")}
-      >
-        <Text style={styles.homeButtonText}>Redeem Your Points</Text>
-      </TouchableOpacity>
+            >
+            <LinearGradient
+              colors={['#3F63CB', '#679BFF']}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.homeButtonText}>Redeem Your Points</Text>
+            </LinearGradient>
+          </TouchableOpacity> */}
+          <TouchableOpacity >
+                          <LinearGradient
+                          colors={['#3F63CB', '#679BFF']}
+                          style={styles.button}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                        >
+                          {/*  */}
+                        
+                          <Text style={styles.buttonText} onPress={() => navigation.navigate("RedeemPage")}
+                          >Redeem your points</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
 
-      {showModal && (
+      {/* {showModal && (
         <Animated.View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Congratulations!</Text>
@@ -167,7 +200,14 @@ const SpinAndWin = () => {
             </Text>
           </View>
         </Animated.View>
-      )}
+      )} */}
+
+      <PointsModal 
+        visible={showModal} 
+        points={wonPoints}
+        onClose={() => setShowModal(false)}
+
+      />
 
       {showErrorModal && (
         <Animated.View style={styles.modalBackground}>
@@ -186,22 +226,35 @@ const SpinAndWin = () => {
         </Animated.View>
       )}
 
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton} onPress={deleteCustomerToken}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
-    </LinearGradient>
-  );
+    </View>
+    </ImageBackground>
+      );
 };
 
 export default SpinAndWin;
 
 const styles = StyleSheet.create({
+  backgroundContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // top: '-5%',
+    // opacity: 2,
+  },
   greetingText: {
     fontSize: 18,
-    color: "#333",
+    color: 'white',
     textAlign: "center",
+    // marginTop: 20,
+    fontWeight: "600",
+    marginTop: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 10,
     marginTop: 20,
+    color: 'white',
   },
   logoutButton: {
     position: "absolute",
@@ -222,6 +275,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    top: "3%",
+
   },
   topBar: {
     flexDirection: "row",
@@ -304,18 +359,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  homeButton: {
-    backgroundColor: "#1E1E1E",
-    borderColor: "#fff",
-    borderWidth: 2,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  button: {
+    width: "100%",
+    height: 50,
+  //   padding: 20,
+    backgroundColor: '#3F63CB',
     borderRadius: 10,
-    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   homeButtonText: {
-    color: "#fff",
-    fontSize: 18,
+    color: "white",
+    fontSize: 16,
     fontWeight: "bold",
   },
   modalBackground: {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef  } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Image, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Image, TouchableWithoutFeedback, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons'; // Assuming Ionicons is used for icons
@@ -8,6 +8,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SvgUri } from 'react-native-svg';
 import ipAddress from '../../config';
 import { debounce } from 'lodash';
+import { LinearGradient } from 'expo-linear-gradient';
+import valetstartingpage from './valet_starting_page'
+import CustomHeader from '../../layout/CustomHeader'; 
+
+// import BillIcon from './svg/bill1.svg';
+
+
+
 export default function SettingsScreen({ navigation }) {
   const [napkins, setNapkins] = useState(false);
   const [sugar, setSugar] = useState(false);
@@ -24,6 +32,7 @@ export default function SettingsScreen({ navigation }) {
   const [customRequest, setCustomRequest] = useState('');
   const [customButtons, setCustomButtons] = useState([]);
   const [isOrdering, setIsOrdering] = useState(false); // Using state to track ordering status
+  const [customerName, setCustomerName] = useState('');
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,13 +47,7 @@ export default function SettingsScreen({ navigation }) {
           }
         });
         const data = await response.data;
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
-        console.log("hdioewhodiweuuuuuuuuuuuuuuuuuuuuuuuuu")
+        setCustomerName(response.data.name);
         console.log(data);
         setCustomButtons(data); // Set custom buttons state
       } catch (error) {
@@ -102,7 +105,6 @@ export default function SettingsScreen({ navigation }) {
   
     return () => clearInterval(interval); // Clean up the interval
   }, []);
-  
 
   const handleOrder = async (order) => {
     console.log("Handle order called for:", order); // Log the order
@@ -138,186 +140,170 @@ export default function SettingsScreen({ navigation }) {
   };
   
 
-  const handleCustomRequest = async () => {
-    try {
-      const tableId = await AsyncStorage.getItem('tableId');
-      const tableToken = await AsyncStorage.getItem('tableToken');
-      const restoId = await AsyncStorage.getItem('restoId');
-
-      await axios.post(
-        `${ipAddress}/api/ButtonsRoutes/AddOrder`,
-        {
-          tableId,
-          order: customRequest,
-          restoId: restoId
-        },
-        {
-          headers: {
-            Authorization: tableToken,
-          },
-        }
-      );
-      setModalVisible(true);
-      setCustomRequest('');
-      setTimeout(() => {
-        setModalVisible(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Error placing custom order:', error);
-    }
-  };
   
   return (
-    
-    <View style={styles.container}>
-      <View style={styles.bigButtonContainer}>
-        <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('MenuScreen')}>
-          <Text style={styles.bigButtonText}>MENU</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('ValetScreen')}>
-          <Text style={styles.bigButtonText}>VALET</Text>
-        </TouchableOpacity>
-      </View>
-            {/* <SvgUri width="100%" height="100%" uri="http://74.208.98.3:3030/uploads/image-1719996835746.svg" />
-      <Image
-        source={{ uri: 'http://74.208.98.3:3030/uploads/image-1719996835746.svg' }}
-        style={{width:250, height:250,backgroundColor: 'white', borderColor: 'black', borderWidth: 1 }}
-      /> */}
-      <Text style={styles.label}>REQUEST: </Text>
-      
-
-      <ScrollView contentContainerStyle={styles.buttonContainer} showsVerticalScrollIndicator={false}>
-      <TouchableWithoutFeedback>
-  <View style={styles.buttonRow}>
-    {napkins && (
-      <TouchableOpacity 
-      style={styles.card}
-      onPress={() => handleOrder('napkins')}
-      disabled={isOrdering} // Disable button when ordering
-      >
-        <Image source={require('./svg/napkins.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Napkins</Text>
-      </TouchableOpacity>
-    )}
-    {sugar && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('sugar')}>
-        <Ionicons name="cube" size={40} color="#fff" />
-        <Text style={styles.cardText}>Sugar</Text>
-      </TouchableOpacity>
-    )}
-    {salt && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('salt')}>
-        <Image source={require('./svg/salt.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Salt</Text>
-      </TouchableOpacity>
-    )}
-    {oil && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('oil')}>
-        <Ionicons name="water" size={40} color="#fff" />
-        <Text style={styles.cardText}>Oil</Text>
-      </TouchableOpacity>
-    )}
-    {glassOfIce && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('glassOfIce')}>
-        <Image source={require('./svg/glassofice.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Glass of Ice</Text>
-      </TouchableOpacity>
-    )}
-    {emptyGlass && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('emptyGlass')}>
-        <Image source={require('./svg/emptyGlass.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Empty Glass</Text>
-      </TouchableOpacity>
-    )}
-    {sousPlat && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('sousPlat')}>
-        <Image source={require('./svg/emptyPlate.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Sous Plat</Text>
-      </TouchableOpacity>
-    )}
-    {bill && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('bill')}>
-        <Image source={require('./svg/bill.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Bill</Text>
-      </TouchableOpacity>
-    )}
-    {shishaCharcoal && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('shishaCharcoal')}>
-        <Ionicons name="flame" size={40} color="#fff" />
-        <Text style={styles.cardText}>Shisha Charcoal</Text>
-      </TouchableOpacity>
-    )}
-    {toothpick && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('toothpick')}>
-        <Image source={require('./svg/toothpick.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Toothpick</Text>
-      </TouchableOpacity>
-    )}
-    {ketchup && (
-      <TouchableOpacity style={styles.card} onPress={() => handleOrder('ketchup')}>
-        <Image source={require('./svg/ketchup.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Ketchup</Text>
-      </TouchableOpacity>
-    )}
-    {customButtons.map((button) => (
-      <TouchableOpacity key={button._id} style={styles.card} onPress={() => handleOrder(button.order)}>
-        <SvgUri width="50" height="50" uri={button.svgLink} />
-        <Text style={styles.cardText}>{button.order}</Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-  </TouchableWithoutFeedback>
-</ScrollView>
- 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <Text style={styles.modalText}>Order Placed Successfully!</Text>
+    <LinearGradient
+      colors={['#3F63CB', '#003266', '#000000']}
+      locations={[0, 0.4895, 0.9789]}
+      style={styles.container}
+    >    
+      <View style={styles.container}>
+        <View style={styles.content}>
+        {/* <CustomHeader /> */}
+          <Image source={require('../../assets/logo1.png')} style={styles.logo}/>
+          
+          <View style={styles.bigButtonContainer}>
+            <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('MenuScreen')}>
+              <Image source={require('../../assets/menu.png')} style={styles.image}/>
+              <Text style={styles.bigButtonText}>MENU</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('valetstartingpage')}>
+              <Image source={require('../../assets/valet.png')} style={styles.image}/>
+              <Text style={styles.bigButtonText}>VALET</Text>
+            </TouchableOpacity>
+          </View>
+  
+  
+          <ScrollView contentContainerStyle={styles.buttonContainer}>
+          <Text style={styles.label}>Others</Text>
+            <View style={styles.buttonRow}>
+              {bill && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('bill')}>
+                    <Image source={require('../OrderScreen/svg/bill.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Bill</Text>
+                </View>
+              )}
+              {napkins && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('napkins')}>
+                    <Image source={require('../OrderScreen/svg/napkins1.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Napkins</Text>
+                </View>
+              )}
+              {emptyGlass && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('emptyGlass')}>
+                    <Image source={require('../OrderScreen/svg/glass.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Glass</Text>
+                </View>
+              )}
+              {sugar && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('sugar')}>
+                  <Image source={require('../OrderScreen/svg/sugar.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Sugar</Text>
+                </View>
+              )}
+              {salt && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('salt')}>
+                    <Image source={require('../OrderScreen/svg/salt1.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Salt</Text>
+                </View>
+              )}
+              {oil && (
+                <View style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder('oil')}>
+                  <Image source={require('../OrderScreen/svg/oil.png')} style={styles.icon} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>Oil</Text>
+                </View>
+              )}
+              {/* {customButtons.map((button) => (
+                <View key={button._id} style={styles.buttonColumn}>
+                  <TouchableOpacity style={styles.card} onPress={() => handleOrder(button.order)}>
+                    <SvgUri width="50" height="50" uri={button.svgLink} />
+                  </TouchableOpacity>
+                  <Text style={styles.cardText}>{button.order}</Text>
+                </View>
+              ))} */}
+            </View>
+          </ScrollView>
+  
+           <Modal
+                  animationType="fade"
+                  transparent={true}
+                  visible={modalVisible}
+                >
+                  <View style={styles.modalBackground}>
+                    <LinearGradient
+                                colors={['#000000', '#003266']}
+                                style={styles.modalContent}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 0, y: 0.9789 }}
+                              >
+                    <View style={styles.modalContainer}>
+                      <Text style={styles.modalText}>Your request has been recieved!</Text>
+                    </View>
+                    </LinearGradient>
+                  </View>
+                </Modal>
         </View>
-      </Modal>
-      
-    </View>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    top: 20,
+  },
+  logo: {
+    width: 90,
+    height: 90,
+    marginBottom: 20,
+    top: -10,
+   },
+  image: {
+    width: 100,
+    height: 100,
+  },
   buttonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
     width: '100%',
-    padding: 10,
+    paddingHorizontal: 10,
+    top: 40,
+  },
+  buttonColumn: {
+    alignItems: 'center',
+    width: '15%',
   },
   buttonRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
+    justifyContent: 'flex-start',
+    gap: 30,
   },
   card: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000',
-    padding: 20,
+      backgroundColor: 'rgba(49, 49, 49, 0.4)',
+    padding: 10,
     borderRadius: 10,
-    marginBottom: 10,
-    width: '30%', // Adjust width for better responsiveness
-    borderWidth: 4,
-    borderColor: '#5c5c5c',
+    width: '100%',
+    aspectRatio: 1,
+    // opacity: 0.8,
+    
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: '70%',  // Increased from fixed 40px
+    height: '70%', // Increased from fixed 40px
     tintColor: 'white',
+    resizeMode: 'contain' // Added to maintain aspect ratio
   },
   cardText: {
     marginTop: 10,
-    fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
     color: '#fff',
     textAlign: 'center',
   },
@@ -344,21 +330,19 @@ const styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor: '#757575',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
-    marginBottom: 50, // FOR FOOTER
+    // marginBottom: 0,
   },
   label: {
-    color: '#157f44',
+    color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 20,
     textShadowColor: 'black',
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 6,
+    alignSelf: 'flex-start',
   },
   webView: {
     width: 50,
@@ -376,30 +360,27 @@ const styles = StyleSheet.create({
   bigButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
-    width: '100%',
+    gap: 10,
+    marginTop: 50,
+    width: 580,
+    height: 200,
   },
   bigButton: {
     flex: 1,
-    backgroundColor: '#000',
-    paddingVertical: 20,
+    // paddingVertical: 20,
     marginHorizontal: 10,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 4,  // Add this
-    borderColor: '#5c5c5c',  // Add this
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    height: 230,
+    // opacity: 0.8,
   },
   bigButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-  },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 20,
   },
   modalText: {
     color: '#fff',
@@ -436,4 +417,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+
+    borderRadius: 10,
+    width: '90%',
+    alignItems: 'center',
+  },
+  modalContent: {
+    borderRadius: 20,
+    padding: 10,
+    width: '100%',
+    maxWidth: 450,
+    height: 150,
+    alignItems: 'center',
+    margin: 0,
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
 });
+

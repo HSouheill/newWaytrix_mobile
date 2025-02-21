@@ -1,13 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert, TouchableWithoutFeedback  } from 'react-native';
+import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert, TouchableWithoutFeedback, Image  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ipAddress from '../config';
+import { LinearGradient } from 'expo-linear-gradient';
+
+
+const AnimatedRatingButton = ({ 
+  label, 
+  isSelected, 
+  onPress, 
+  gifSource, 
+  staticImageSource,
+  buttonStyle, 
+  selectedStyle,
+  textStyle, 
+  isPlaying
+}) => {
+  return (
+    <TouchableOpacity
+      style={[buttonStyle, isSelected ? selectedStyle : null]}
+      onPress={onPress}
+    >
+      <Image 
+        key={isPlaying ? 'playing' : 'static'}
+        source={isPlaying ? gifSource : staticImageSource}
+        style={styles.emojiicon}
+        resizeMode="contain"
+      />
+      <Text style={textStyle}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
+
 
 const AnimatedModal = Animated.createAnimatedComponent(Modal);
-const SurveyScreen = ({ navigation }) => {
+const Diningexperience = ({ navigation }) => {
   const [name, setName] = useState('');
+  // const [firstname, setfirstName] = useState('');
+  const [lastname, setlastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [foodQuality, setFoodQuality] = useState('');
   const [serviceQuality, setServiceQuality] = useState('');
   const [staffFriendliness, setStaffFriendliness] = useState('');
@@ -19,6 +52,16 @@ const SurveyScreen = ({ navigation }) => {
   const [tableId, setTableId] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [playingButton, setPlayingButton] = useState(null);
+  const [playingFoodQuality, setPlayingFoodQuality] = useState(null);
+const [playingServiceQuality, setPlayingServiceQuality] = useState(null);
+const [playingStaffFriendliness, setPlayingStaffFriendliness] = useState(null);
+const [playingValueForMoney, setPlayingValueForMoney] = useState(null);
+const [playingRestaurantCleanliness, setPlayingRestaurantCleanliness] = useState(null);
+const [playingRestaurantDesign, setPlayingRestaurantDesign] = useState(null);
+const [playingWayTrixService, setPlayingWayTrixService] = useState(null);
+
+
   useEffect(() => {
     AsyncStorage.getItem('tableId').then(value => {
       setTableId(value);
@@ -28,24 +71,80 @@ const SurveyScreen = ({ navigation }) => {
     if (modalVisible) {
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 50000,
         useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 500,
+        duration: 50000,
         useNativeDriver: true,
       }).start();
     }
   }, [modalVisible]);
   
-  const handleQualitySelection = (quality, setter) => {
+  const handleQualitySelection = (quality, setter, category) => {
     setter(quality);
+    // setPlayingButton(quality); 
+    if (category === 'food') {
+      setPlayingFoodQuality(quality); // Set playing state for food quality
+    } else if (category === 'service') {
+      setPlayingServiceQuality(quality); // Set playing state for service quality
+    }
+    else if (category === 'staff') {
+      setPlayingStaffFriendliness(quality); // Set playing state for staff friendliness
+    }
+    else if (category === 'value') {
+      setPlayingValueForMoney(quality); // Set playing state for value for money
+    }
+    else if (category === 'cleanliness') {
+      setPlayingRestaurantCleanliness(quality); // Set playing state for restaurant cleanliness
+    }
+    else if (category === 'design') {
+      setPlayingRestaurantDesign(quality); // Set playing state for restaurant design
+    }
+    else if (category === 'waytrix') {
+      setPlayingWayTrixService(quality); // Set playing state for waytrix service
+    }
+
+  };
+
+  const buttonConfig = {
+    excellent: {
+      gif: require('../assets/gif/excellent_anim.gif'),
+      static: require('../assets/gif/excellent.png'),
+    },
+    good: {
+      gif: require('../assets/gif/good_anim.gif'),
+      static: require('../assets/gif/good.png'),
+    },
+    average: {
+      gif: require('../assets/gif/average_anim.gif'),
+      static: require('../assets/gif/average.png'),
+    },
+    poor: {
+      gif: require('../assets/gif/sad_anim.gif'),
+      static: require('../assets/gif/poor.png'),
+    },
   };
 
 
   const handleSubmit = async () => {
+
+    if (!name || !lastname || !email || !phone || !foodQuality || !serviceQuality || 
+      !staffFriendliness || !valueForMoney || !restaurantCleanliness || 
+      !restaurantDesign || !wayTrixService || !additionalComments || !tableId) {
+    Alert.alert('Error', 'Please fill in all fields');
+    return;
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    Alert.alert('Error', 'Please enter a valid email address');
+    return;
+  }
+
     try {
       const tableToken = await AsyncStorage.getItem('tableToken');
   
@@ -59,6 +158,8 @@ const SurveyScreen = ({ navigation }) => {
         wayTrixService,
         additionalComments,
         name,
+        lastname,
+        email,
         phone,
         tableId
       };
@@ -79,6 +180,8 @@ const SurveyScreen = ({ navigation }) => {
         }, 4000);
   
         setName('');
+        setlastName('');
+        setEmail('');
         setPhone('');
         setFoodQuality('');
         setServiceQuality('');
@@ -97,344 +200,394 @@ const SurveyScreen = ({ navigation }) => {
       console.error('Error retrieving tableToken from AsyncStorage:', error);
     }
   };
+
+
+  
   
 
   return (
+    <LinearGradient
+          colors={['#3F63CB', '#003266', '#000000']}
+          style={styles.gradientContainer}
+        >
+          {/* <View style={styles.headerContainer}> */}
+            <Image source={require('../assets/logo1.png')} style={styles.logo} />
+          {/* </View> */}
+
+
     <ScrollView contentContainerStyle={styles.container}>
           <TouchableWithoutFeedback>
-          <View style={{ flex: 1 }}>
-      <View style={styles.questionContainer}>
-        {/* <Text style={styles.label}>Name:</Text> */}
+          <View style={styles.content}>
+          <Text style={styles.title}>Survey Name</Text>
+
+      <Text style={styles.sectionTitle}>Personal Info</Text>
+      <View style={styles.nameContainer}>
+                <View style={styles.nameInput}>
+                  <Text style={styles.label}>First Name</Text>
+                  <TextInput
+                  style={styles.textInput}
+                  onChangeText={setName}
+                  value={name}
+                  placeholder="Write Here"
+                  placeholderTextColor="#ccc" 
+                />
+              </View>
+                <View style={styles.nameInput}>
+                  <Text style={styles.label}>Last Name</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setlastName}
+                    value={lastname}
+                    placeholder="Write Here"
+                    placeholderTextColor="#ccc" 
+                  />
+                </View>
+              </View>
+
+       <View style={styles.questionContainer}>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.textInput}
-          onChangeText={setName}
-          value={name}
-          placeholder="ENTER YOUR NAME"
-          placeholderTextColor="#fff" 
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Write Here"
+          placeholderTextColor="#ccc" 
         />
-      </View>
-
+        </View>
+        
       <View style={styles.questionContainer}>
-        {/* <Text style={styles.label}>Phone:</Text> */}
+      <Text style={styles.label}>Phone Number</Text>
         <TextInput
           style={styles.textInput}
           onChangeText={setPhone}
           value={phone}
-          placeholder="ENTER YOUR PHONE NUMBER"
-          placeholderTextColor="#fff" 
+          placeholder="Write Here"
+          placeholderTextColor="#ccc" 
           keyboardType="phone-pad"
         />
       </View>
 
+        
+     
+
+      <Text style={[styles.sectionTitle, styles.diningExperience]} >Dining Experience</Text>
+      <View style={styles.diningExperienceContainer}>
       <View style={styles.questionContainer}>
-        <Text style={styles.label}>QUALITY OF FOOD:</Text>
+        <Text style={styles.label}>1. Quality Food</Text>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.excellentRatingButton, foodQuality === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-          onPress={() => handleQualitySelection('Excellent', setFoodQuality)}
-        >
-          <Text style={[styles.buttonText, foodQuality === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}>
-            Excellent</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.goodRatingButton, foodQuality === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-          onPress={() => handleQualitySelection('Good', setFoodQuality)}
-        >
-          <Text style={[styles.buttonText, foodQuality === 'Good' ? styles.goodButtonText : styles.buttonText]}>
-            Good</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.averageRatingButton, foodQuality === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-          onPress={() => handleQualitySelection('Average', setFoodQuality)}
-        >
-          <Text style={[styles.buttonText, foodQuality === 'Average' ? styles.averageButtonText : styles.buttonText]}
-          >Average</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.poorRatingButton, foodQuality === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-          onPress={() => handleQualitySelection('Poor', setFoodQuality)}
-        >
-          <Text style={[styles.buttonText, foodQuality === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-          >Poor</Text>
-        </TouchableOpacity>
-      </View>
-      </View>
-
-      {/* Repeat similar structures for other questions */}
-      {/* Service Quality */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>QUALITY OF SERVICE:</Text>
-        <View style={styles.buttonContainer}>
-      <TouchableOpacity
-        style={[styles.excellentRatingButton, serviceQuality === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-        onPress={() => handleQualitySelection('Excellent', setServiceQuality)}
-      >
-        <Text style={[styles.buttonText, serviceQuality === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-        >Excellent</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.goodRatingButton, serviceQuality === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-        onPress={() => handleQualitySelection('Good', setServiceQuality)}
-      >
-        <Text style={[styles.buttonText, serviceQuality === 'Good' ? styles.goodButtonText : styles.buttonText]}
-        >Good</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.averageRatingButton, serviceQuality === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-        onPress={() => handleQualitySelection('Average', setServiceQuality)}
-      >
-        <Text style={[styles.buttonText, serviceQuality === 'Average' ? styles.averageButtonText : styles.buttonText]}
-        >Average</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.poorRatingButton, serviceQuality === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-        onPress={() => handleQualitySelection('Poor', setServiceQuality)}
-      >
-        <Text style={[styles.buttonText, serviceQuality === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-        >Poor</Text>
-      </TouchableOpacity>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={foodQuality === label}
+          onPress={() => handleQualitySelection(label, setFoodQuality, 'food')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            foodQuality === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingFoodQuality === label}
+        />
+      ))}
     </View>
       </View>
 
-      {/* Friendliness of Staff */}
       <View style={styles.questionContainer}>
-        <Text style={styles.label}>FRIENDLINESS OF STAFF:</Text>
+      <Text style={styles.label}>2. Quality Of Service</Text>
+      <View style={styles.buttonContainer}>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={serviceQuality === label}
+          onPress={() => handleQualitySelection(label, setServiceQuality, 'service')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            serviceQuality === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingServiceQuality === label}
+        />
+      ))}
+    </View>
+      </View>
+
+      <View style={styles.questionContainer}>
+      <Text style={styles.label}>3. Friendliness Of Staff</Text>
+      <View style={styles.buttonContainer}>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={staffFriendliness === label}
+          onPress={() => handleQualitySelection(label, setStaffFriendliness, 'staff')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            staffFriendliness === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingStaffFriendliness === label}
+        />
+      ))}
+    </View>
+      </View>
+
+      <View style={styles.questionContainer}>
+      <Text style={styles.label}>4. Value Of Money</Text>
+      <View style={styles.buttonContainer}>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={valueForMoney === label}
+          onPress={() => handleQualitySelection(label, setValueForMoney, 'value')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            valueForMoney === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingValueForMoney === label}
+        />
+      ))}
+    </View>
+      </View>
+
+      <View style={styles.questionContainer}>
+      <Text style={styles.label}>5. Cleanliness Of Restaurant</Text>
+
+      <View style={styles.buttonContainer}>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={restaurantCleanliness === label}
+          onPress={() => handleQualitySelection(label, setRestaurantCleanliness, 'cleanliness')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            restaurantCleanliness === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingRestaurantCleanliness === label}
+        />
+      ))}
+    </View>
+      </View>
+
+      <View style={styles.questionContainer}>
+      <Text style={styles.label}>6. Restaurant Design</Text>
+      <View style={styles.buttonContainer}>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={restaurantDesign === label}
+          onPress={() => handleQualitySelection(label, setRestaurantDesign, 'design')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            restaurantDesign === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingRestaurantDesign === label}
+        />
+      ))}
+    </View>
+      </View>
+
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>7. Waitrex Device Service</Text>
+
         <View style={styles.buttonContainer}>
-    <TouchableOpacity
-      style={[styles.excellentRatingButton, staffFriendliness === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-      onPress={() => handleQualitySelection('Excellent', setStaffFriendliness)}
-    >
-      <Text style={[styles.buttonText, staffFriendliness === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-      >Excellent</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity
-      style={[styles.goodRatingButton, staffFriendliness === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-      onPress={() => handleQualitySelection('Good', setStaffFriendliness)}
-    >
-      <Text style={[styles.buttonText, staffFriendliness === 'Good' ? styles.goodButtonText : styles.buttonText]}
-      >Good</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity
-      style={[styles.averageRatingButton, staffFriendliness === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-      onPress={() => handleQualitySelection('Average', setStaffFriendliness)}
-    >
-      <Text style={[styles.buttonText, staffFriendliness === 'Average' ? styles.averageButtonText : styles.buttonText]}
-      >Average</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity
-      style={[styles.poorRatingButton, staffFriendliness === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-      onPress={() => handleQualitySelection('Poor', setStaffFriendliness)}
-    >
-      <Text style={[styles.buttonText, staffFriendliness === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-      >Poor</Text>
-    </TouchableOpacity>
-      </View>
+      {Object.entries({
+        Excellent: 'excellent',
+        Good: 'good',
+        Average: 'average',
+        Poor: 'poor'
+      }).map(([label, key]) => (
+        <AnimatedRatingButton
+          key={key}
+          label={label}
+          isSelected={ wayTrixService === label}
+          onPress={() => handleQualitySelection(label, setWayTrixService, 'waytrix')}
+          gifSource={buttonConfig[key].gif}
+          staticImageSource={buttonConfig[key].static}
+          buttonStyle={styles[`${key}RatingButton`]}
+          selectedStyle={styles[`${key}Button`]}
+          textStyle={[
+            styles.buttonText,
+            wayTrixService === label ? styles[`${key}ButtonText`] : styles.buttonText
+          ]}
+          isPlaying={playingWayTrixService === label}
+        />
+      ))}
+    </View>
       </View>
 
-      {/* Value for Money */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>VALUE FOR MONEY:</Text>
-        <View style={styles.buttonContainer}>
-  <TouchableOpacity
-    style={[styles.excellentRatingButton, valueForMoney === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-    onPress={() => handleQualitySelection('Excellent', setValueForMoney)}
-  >
-    <Text style={[styles.buttonText, valueForMoney === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-    >Excellent</Text>
-  </TouchableOpacity>
 
-  <TouchableOpacity
-    style={[styles.goodRatingButton, valueForMoney === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-    onPress={() => handleQualitySelection('Good', setValueForMoney)}
-  >
-    <Text style={[styles.buttonText, valueForMoney === 'Good' ? styles.goodButtonText : styles.buttonText]}
-    >Good</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.averageRatingButton, valueForMoney === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-    onPress={() => handleQualitySelection('Average', setValueForMoney)}
-  >
-    <Text style={[styles.buttonText, valueForMoney === 'Average' ? styles.averageButtonText : styles.buttonText]}
-    >Average</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.poorRatingButton, valueForMoney === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-    onPress={() => handleQualitySelection('Poor', setValueForMoney)}
-  >
-    <Text style={[styles.buttonText, valueForMoney === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-    >Poor</Text>
-  </TouchableOpacity>
-</View>
+      
       </View>
+    
+      <Text style={[styles.sectionTitle, styles.othersSection ]}>Others</Text>
 
-      {/* Cleanliness of Restaurant */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>CLEANLINESS OF RESTAURANT:</Text>
-        <View style={styles.buttonContainer}>
-  <TouchableOpacity
-    style={[styles.excellentRatingButton, restaurantCleanliness === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-    onPress={() => handleQualitySelection('Excellent', setRestaurantCleanliness)}
-  >
-    <Text style={[styles.buttonText, restaurantCleanliness === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-    >Excellent</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.goodRatingButton, restaurantCleanliness === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-    onPress={() => handleQualitySelection('Good', setRestaurantCleanliness)}
-  >
-    <Text style={[styles.buttonText, restaurantCleanliness === 'Good' ? styles.goodButtonText : styles.buttonText]}
-    >Good</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.averageRatingButton, restaurantCleanliness === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-    onPress={() => handleQualitySelection('Average', setRestaurantCleanliness)}
-  >
-    <Text style={[styles.buttonText, restaurantCleanliness === 'Average' ? styles.averageButtonText : styles.buttonText]}
-    >Average</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.poorRatingButton, restaurantCleanliness === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-    onPress={() => handleQualitySelection('Poor', setRestaurantCleanliness)}
-  >
-    <Text style={[styles.buttonText, restaurantCleanliness === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-    >Poor</Text>
-  </TouchableOpacity>
-</View>
-      </View>
-
-      {/* Restaurant Design */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>RESTAURANT DESIGN:</Text>
-        <View style={styles.buttonContainer}>
-  <TouchableOpacity
-    style={[styles.excellentRatingButton, restaurantDesign === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-    onPress={() => handleQualitySelection('Excellent', setRestaurantDesign)}
-  >
-    <Text style={[styles.buttonText, restaurantDesign === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-    >Excellent</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.goodRatingButton, restaurantDesign === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-    onPress={() => handleQualitySelection('Good', setRestaurantDesign)}
-  >
-    <Text style={[styles.buttonText, restaurantDesign === 'Good' ? styles.goodButtonText : styles.buttonText]}
-    >Good</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.averageRatingButton, restaurantDesign === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-    onPress={() => handleQualitySelection('Average', setRestaurantDesign)}
-  >
-    <Text style={[styles.buttonText, restaurantDesign === 'Average' ? styles.averageButtonText : styles.buttonText]}
-    >Average</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.poorRatingButton, restaurantDesign === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-    onPress={() => handleQualitySelection('Poor', setRestaurantDesign)}
-  >
-    <Text style={[styles.buttonText, restaurantDesign === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-    >Poor</Text>
-  </TouchableOpacity>
-</View>
-      </View>
-
-      {/* WayTrix Device Service */}
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>WAYTRIX DEVICE SERVICE:</Text>
-        <View style={styles.buttonContainer}>
-  <TouchableOpacity
-    style={[styles.excellentRatingButton, wayTrixService === 'Excellent' ? styles.excellentButton : styles.excellentRatingButton]}
-    onPress={() => handleQualitySelection('Excellent', setWayTrixService)}
-  >
-    <Text style={[styles.buttonText, wayTrixService === 'Excellent' ? styles.excellentButtonText : styles.buttonText]}
-    >Excellent</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.goodRatingButton, wayTrixService === 'Good' ? styles.goodButton : styles.goodRatingButton]}
-    onPress={() => handleQualitySelection('Good', setWayTrixService)}
-  >
-    <Text style={[styles.buttonText, wayTrixService === 'Good' ? styles.goodButtonText : styles.buttonText]}
-    >Good</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.averageRatingButton, wayTrixService === 'Average' ? styles.averageButton : styles.averageRatingButton]}
-    onPress={() => handleQualitySelection('Average', setWayTrixService)}
-  >
-    <Text style={[styles.buttonText, wayTrixService === 'Average' ? styles.averageButtonText : styles.buttonText]}
-    >Average</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={[styles.poorRatingButton, wayTrixService === 'Poor' ? styles.poorButton : styles.poorRatingButton]}
-    onPress={() => handleQualitySelection('Poor', setWayTrixService)}
-  >
-    <Text style={[styles.buttonText, wayTrixService === 'Poor' ? styles.poorButtonText : styles.buttonText]}
-    >Poor</Text>
-  </TouchableOpacity>
-</View>
-      </View>
-
-      <View style={styles.questionContainer}>
-        <Text style={styles.label}>ADDITIONAL COMMENTS:</Text>
+      <View style={[styles.questionContainer, styles.commentsContainer]}>
+        <Text style={styles.label}>1. Additional Comments</Text>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, styles.commentsInput]}
           onChangeText={setAdditionalComments}
           value={additionalComments}
-          placeholder="ENTER YOUR COMMENTS HERE"
-          placeholderTextColor="#fff" 
+          placeholder="Write Here"
+          placeholderTextColor="#ccc" 
           multiline
+          textAlignVertical="top"
+          
         />
       </View>
-      <AnimatedModal
-      visible={modalVisible}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
-          <Text style={styles.modalText}>Survey submitted successfully,</Text>
-          <Text style={styles.modalText}>Thanks for your review</Text>
 
-          
-        </Animated.View>
-      </View>
-    </AnimatedModal>
+      <Modal
+                                          animationType="fade"
+                                          transparent={true}
+                                          visible={modalVisible}
+                                          onRequestClose={() => setModalVisible(false)}
+                                        >
+                                          <View style={styles.modalBackground}>
+                                            <LinearGradient
+                                                        colors={['#000000', '#003266']}
+                                                        style={styles.modalContent}
+                                                        start={{ x: 0, y: 0 }}
+                                                        end={{ x: 0, y: 0.9789 }}
+                                                      >
+                                            <View style={styles.modalContainer}>
+                                              <Text style={styles.modalText}>Thank you for completing our survey!</Text>
+                                            </View>
+                                            </LinearGradient>
+                                          </View>
+                                        </Modal>
+      
+
       <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+      <LinearGradient
+                      colors={['#3F63CB', '#679BFF']}
+                      style={styles.button}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                    >
         <Text style={styles.submitButtonText}>Submit</Text>
+     </LinearGradient>
       </TouchableOpacity>
       </View>
       </TouchableWithoutFeedback>
     </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  emojiicon: {
+    width: 20,
+    height: 20,
+  },
+  gradientContainer: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#757575', // Background color changed to black
+    // top: 20,
+    // backgroundColor: '#757575', // Background color changed to black
+  },
+  logo: {
+    width: 90,
+    height: 90,
+    alignSelf: 'center',
+    top: 30,
+    marginBottom: 30
+  },
+  title: {
+      fontSize: 24,
+      color: 'white',
+      textAlign: 'center',
+      fontWeight: '500',
+      marginTop: 20,
+  },
+  content: {
+    flex: 1,
+    gap: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: 'white',
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 20,
+  },
+  nameInput: {
+    flex: 1,
+    gap: 20,
+  },
+  textInput: {
+    backgroundColor: 'rgba(49, 49, 49, 0.4)',
+    borderWidth: 0.8,
+    borderColor: 'white',
+    borderRadius: 12,
+    padding: 10,
+    color: 'white',
+    minHeight: 50,
+    width: '100%',
+    resizeMode: 'contain',
   },
   questionContainer: {
-    marginBottom: 20,
+    // marginBottom: 10,
+    gap: 20,
   },
   label: {
     fontWeight: 'bold',
@@ -442,55 +595,61 @@ const styles = StyleSheet.create({
     color: 'white', // Text color changed to white
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-  },
-  modalContent: {
-    backgroundColor: 'black',
-    borderWidth: 5,
-    borderColor: 'white',
     borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-    elevation: 5,
+    width: '90%',
   },
   modalText: {
-    fontSize: 18,
+    color: '#fff',
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
-    color: 'white',
+    textAlign: 'center',
+  },
+  modalContent: {
+    borderRadius: 20,
+    padding: 10,
+    width: '100%',
+    maxWidth: 350,
+    height: 130,
+    alignItems: 'center',
+    margin: 0,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignSelf: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    // marginTop: 10,
+    width: '100%',
   },
-  textInput: {
-    backgroundColor: 'black', // Darker background for input
-    borderWidth: 4,
-    borderColor: '#5c5c5c',
-    fontWeight: 'bold',
-    borderRadius: 4,
-    padding: 10,
-    color: 'white', // Text color inside inputs changed to white
-    minHeight: 40,
-  },
+  // textInput: {
+  //   backgroundColor: 'black', // Darker background for input
+  //   borderWidth: 4,
+  //   borderColor: '#5c5c5c',
+  //   fontWeight: 'bold',
+  //   borderRadius: 4,
+  //   padding: 10,
+  //   color: 'white', // Text color inside inputs changed to white
+  //   minHeight: 40,
+  // },
   submitButton: {
-    backgroundColor: 'black', // Darker button background
-    borderWidth: 4,
-    borderColor: '#5c5c5c',
-    padding: 10,
-    borderRadius: 4,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 60, // FOR FOOTER
+    width: 200,
+    height: 53,
+    borderRadius: 10,
+    overflow: 'hidden', // Ensures the gradient does not spill outside the border radius
+    marginBottom: 100,
+    alignSelf: 'center',
   },
   submitButtonText: {
-    color: '#157f44',
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+  },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10, // Ensure that the gradient follows this border radius
   },
 
   ratingButton: {
@@ -507,74 +666,90 @@ const styles = StyleSheet.create({
   
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+    fontWeight: '400',
+    // textTransform: 'uppercase', // Force text to uppercase
   },
 
   excellentButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+    color: '#fff',
+    fontWeight: '400',
+    // textTransform: 'uppercase', // Force text to uppercase
   },
   goodButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+    color: '#fff',
+    fontWeight: '400',
+    // textTransform: 'uppercase', // Force text to uppercase
   },
   averageButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+    color: '#fff',
+    fontWeight: '400',
+    // textTransform: 'uppercase', // Force text to uppercase
   },
   poorButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Force text to uppercase
+    color: '#fff',
+    fontWeight: '400',
+    // textTransform: 'uppercase', // Force text to uppercase
   },
 
   excellentRatingButton: {
+    flexDirection: 'row',
+    gap: 5,
+    // justifyContent: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 4,
+    // paddingHorizontal: 20,
+    borderWidth: 2,
     backgroundColor: 'black',
-    borderColor: '#76ff78',
-    borderRadius: 10,
-    marginHorizontal: 5,
+    borderColor: '#A6A6A680',
+    borderRadius: 5,
+    // marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 130,
   },
   goodRatingButton: {
+    flexDirection: 'row',
+    gap: 5,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 4,
+    // paddingHorizontal: 20,
+    borderWidth: 2,
     backgroundColor: 'black',
-    borderColor: '#daff9e',
-    borderRadius: 10,
+    borderColor: '#A6A6A680',
+    borderRadius: 5,
     marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 130,
+
   },
   averageRatingButton: {
+    flexDirection: 'row',
+    gap: 5,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 4,
+    // paddingHorizontal: 20,
+    borderWidth: 2,
     backgroundColor: 'black',
-    borderColor: '#ffe3aa',
-    borderRadius: 10,
+    borderColor: '#A6A6A680',
+    borderRadius: 5,
     marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 130,
+
   },
   poorRatingButton: {
+    flexDirection: 'row',
+    gap: 5,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 4,
+    // paddingHorizontal: 20,
+    borderWidth: 2,
     backgroundColor: 'black',
-    borderColor: '#ff8a8a',
-    borderRadius: 10,
+    borderColor: '#A6A6A680',
+    borderRadius: 5,
     marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 130,
+
   },
 
   defaultButton: {
@@ -583,27 +758,56 @@ const styles = StyleSheet.create({
   },
   
   excellentButton: {
-    backgroundColor: '#76ff78', // Background color for Excellent
-    borderColor: '#000',
+    backgroundColor: '#3F63CB', // Background color for Excellent
+    borderColor: '#fff',
     color: '#fff',
+    borderWidth: 1,
   },
   
   goodButton: {
-    backgroundColor: '#daff9e', // Background color for Good
-    borderColor: '#000',
+    backgroundColor: '#3F63CB', // Background color for Good
+    borderColor: '#fff',
+    borderWidth: 1,
+
   },
   
   averageButton: {
-    backgroundColor: '#ffe3aa', // Background color for Average
-    borderColor: '#000',
+    backgroundColor: '#3F63CB', // Background color for Average
+    borderColor: '#fff',
+    borderWidth: 1,
+
   },
   
   poorButton: {
-    backgroundColor: '#ff8a8a', // Background color for Poor
-    borderColor: '#000',
+    backgroundColor: '#3F63CB', // Background color for Poor
+    borderColor: '#fff',
+    borderWidth: 1,
+  },
+  diningExperience: {
+    marginTop: 30,
+  },
+  othersSection: {
+    marginTop: 30,
+  },
+  diningExperienceContainer: {
+    padding: 10,
+    gap:20,
+  },
+  commentsContainer: {
+    padding: 10,
+  },
+  commentsInput: {
+    height: 120,
+    paddingStart: 20,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   
 });
 
 
-export default SurveyScreen;
+export default Diningexperience;
