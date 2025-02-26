@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation} from '@react-navigation/native';
 import ipAddress from '../../../config';
 import { LinearGradient } from 'expo-linear-gradient';
 import Change_password from './Change_password';
 import ResetPass from './ResetPass';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 
 
 type RootStackParamList = {
@@ -32,6 +33,7 @@ const ForgotPass = () => {
   const [showNewInputs, setShowNewInputs] = useState(false);
   const [forgotKey, setForgotKey] = useState('');
   const [password, setPassword] = useState('');
+  
   // const navigation = useNavigation();
   const navigation = useNavigation<ForgotPassNavigationProp>();
   

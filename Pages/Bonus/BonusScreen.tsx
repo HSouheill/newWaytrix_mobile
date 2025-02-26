@@ -24,7 +24,7 @@ import PointsModal from './PointsModal';
 const segments = ["1 ", "9 ", "6 ", "2", "10 ", "4 "];
 const initialBalance = 1.7;
 
-const SpinAndWin = () => {
+const BonusScreen = () => {
   const insets = useSafeAreaInsets();
   const labelOpacity = useSharedValue(0);
   const [walletBalance, setWalletBalance] = useState(initialBalance.toString());
@@ -231,14 +231,13 @@ const SpinAndWin = () => {
       );
 };
 
-export default SpinAndWin;
+export default BonusScreen;
 
 const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // top: '-5%',
     // opacity: 2,
   },
   greetingText: {
@@ -247,13 +246,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     // marginTop: 20,
     fontWeight: "600",
-    marginTop: 40,
+    marginTop: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "600",
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: 10,
     color: 'white',
   },
   logoutButton: {
@@ -275,7 +274,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    top: "3%",
+    top: "2%",
 
   },
   topBar: {

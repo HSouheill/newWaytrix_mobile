@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import GetRestoId from './GetRestoId';
 //import LocalImage from '../Pages/waytrix.png'; // Import the local image
 import ipAddress from '../config';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 export default function HomeScreen({ navigation }) {
   const [mediaURL, setMediaURL] = React.useState(null);
@@ -100,6 +102,11 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
+        <LinearGradient
+        colors={['#3F63CB', '#003266', '#000000']}
+        locations={[0, 0.4895, 0.9789]}
+        style={styles.container}
+      >
     <TouchableOpacity activeOpacity={1} onPress={toggleHeaderVisibility} style={styles.container}>
       <GetRestoId />
       {mediaURL && isVideo ? (
@@ -109,7 +116,8 @@ export default function HomeScreen({ navigation }) {
           rate={1.0}
           volume={1.0}
           isMuted={true}
-          resizeMode="cover"
+
+          // resizeMode="cover"
           shouldPlay
           isLooping={false}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
@@ -119,6 +127,7 @@ export default function HomeScreen({ navigation }) {
         mediaURL && <Image source={typeof mediaURL === 'string' ? { uri: mediaURL } : mediaURL} style={styles.image} />
       )}
     </TouchableOpacity>
+    </LinearGradient>
   );
 }
 
@@ -128,6 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 40, // FOR FOOTER
+    // backgroundColor: 'rgba(113, 176, 58, 0.5)', // Semi-transparent background
   },
   video: {
     position: 'absolute',

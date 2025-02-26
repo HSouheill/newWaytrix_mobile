@@ -13,7 +13,7 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 
 
-const changePassword = () => {
+const ChangePassword = () => {
     const [oldPassword, setoldPassword] = useState('');
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [newPassword, setnewPassword] = useState('');
@@ -354,6 +354,6 @@ const styles = StyleSheet.create({
 
 });
 
-export default changePassword;
+export default ChangePassword;
 
 

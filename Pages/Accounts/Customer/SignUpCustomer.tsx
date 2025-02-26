@@ -11,7 +11,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import RNPickerSelect from 'react-native-picker-select';
 import { Dropdown } from 'react-native-element-dropdown';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import OrderScreen from '../../OrderScreen/OrderScreen'
+import OrderScreen from '../../OrderScreen/OrderScreen';
+import { useRoute } from '@react-navigation/native';
+
 
 // import { format } from 'date-fns'; // Add this import
 
@@ -203,6 +205,10 @@ return visible && (
 );
 };
 
+type RouteParams = {
+  source?: string;
+};
+
 const Customer = ({ navigation }) => {
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -217,6 +223,7 @@ const Customer = ({ navigation }) => {
   const [verificationModalVisible, setVerificationModalVisible] = useState(false);
   const [verificationKey, setVerificationKey] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [dob, setDob] = useState(''); 
   const [showDatePicker, setShowDatePicker] = useState(false); 
   const [showCalendar, setShowCalendar] = useState(false);
@@ -235,6 +242,9 @@ const Customer = ({ navigation }) => {
   const [phoneExists, setPhoneExists] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCountryPickerVisible, setIsCountryPickerVisible] = useState(false);
+  const route = useRoute();
+  const params = route.params as RouteParams;
+  const source = params?.source || 'bonus';
 
 
   const phoneNumberLimits = {
@@ -726,6 +736,26 @@ const Customer = ({ navigation }) => {
     return true;
   };
 
+  const clearFormFields = () => {
+    setName('');
+    setLastName('');
+    setUsername('');
+    setEmail('');
+    setPhone('');
+    setPassword('');
+    setconfirmpassword('');
+    setGender('');
+    setAge('');
+    setSelectedDate('');
+    // Reset any error states too
+    setUsernameExists(false);
+    setEmailExists(false);
+    setPhoneExists(false);
+    setPasswordError('');
+    setIsPasswordMatch(true);
+    setEmailError('');
+    setPhoneError('');
+  };
 
   const handleSubmit = () => {
         // Validate phone number length before submitting
@@ -790,6 +820,7 @@ const Customer = ({ navigation }) => {
         console.log(response.data);
         AsyncStorage.setItem('customerId', response.data._id);
         AsyncStorage.setItem('verificationModalVisible', JSON.stringify(true));
+        clearFormFields(); // Clear all form fields
         navigation.navigate('SignIn');
         // setShowOtpModal(true);
       })
@@ -1065,7 +1096,7 @@ const Customer = ({ navigation }) => {
           <View style={styles.labelContainer}>
             <Text style={styles.label}>Username</Text>
             {usernameExists && (
-              <Text style={styles.userExistsText}>Username already taken</Text>
+              <Text style={styles.userExistsText}>Invalid username</Text>
             )}
             </View>
           <TextInput
@@ -1180,26 +1211,50 @@ const Customer = ({ navigation }) => {
               <Text style={styles.errorText}>{emailError}</Text>
             ) : null}
           </View>
+
+           {/* <View style={styles.passwordContainer}>
+                    <TextInput
+                      placeholder="Password"  
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      style={[styles.input, styles.passwordInput]}
+                      placeholderTextColor="#CCCCCC"
+                      autoComplete="off"
+                    />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.icon}>
+                        <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#000000" />
+                  </TouchableOpacity> */}
           
            <Text style={styles.label}>Password</Text>
+           <View style={styles.passwordContainer}>
             <TextInput
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
                 validatePasswords(text, confirmpassword);
+
               }}
               style={[styles.input, !isPasswordMatch && styles.inputError]}
               placeholder="Password"
               placeholderTextColor="#9EA0A4"
-              secureTextEntry
+              secureTextEntry={!showPassword}
+              autoComplete="off"
+
+
             />
+             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.icon}>
+                        <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#000000" />
+                  </TouchableOpacity>
+                  </View>
             {password && password.length < 8 && (
           <Text style={styles.errorText}>Password must be at least 8 characters long</Text>
         )}
+        
 
             <Text style={styles.label}>Confirm Password</Text>
-            <View>
-              <TextInput
+            <View style={styles.passwordContainer}>
+            <TextInput
                 value={confirmpassword}
                 onChangeText={(text) => {
                   setconfirmpassword(text);
@@ -1208,8 +1263,13 @@ const Customer = ({ navigation }) => {
                 style={[styles.input, !isPasswordMatch && styles.inputError]}
                 placeholder="Confirm Password"
                 placeholderTextColor="#9EA0A4"
-                secureTextEntry
-              />
+                secureTextEntry={!showConfirmPassword}
+                autoComplete="off"
+                              />
+                              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.icon}>
+                        <Icon name={showConfirmPassword ? "eye-off" : "eye"} size={24} color="#000000" />
+                  </TouchableOpacity>
+                  {/* </View> */}
               {passwordError && password.length >= 8 ? (
             <Text style={styles.errorText}>{passwordError}</Text>
           ) : null}
@@ -1241,8 +1301,8 @@ const Customer = ({ navigation }) => {
           />
 
         <View style={styles.footer}>
-          <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-            <Text style={styles.footerText}>Already gave an account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignIn', { source: source })}>
+            <Text style={styles.footerText}>Already have an account?</Text>
             <Text style={styles.footerLink}>Log In</Text>
           </TouchableOpacity>
         </View>
@@ -1300,6 +1360,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     // marginBottom: 5,
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
   input: {
     width: '100%',
     padding: 8, 
@@ -1326,6 +1391,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     alignSelf: 'center',
     marginTop: 10,
+  },
+  icon: {
+    position: 'absolute',
+    right: 10,
+    height: '100%',
+    justifyContent: 'center',
+    padding: 10,
   },
   button: {
     flex: 1,

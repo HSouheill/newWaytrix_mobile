@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   drawerContent: {
     position: 'absolute',
     bottom: 0,
-    height: 70,
+    height: 80,
     flexDirection: 'row',
     width: '190%',
     paddingHorizontal: 30,

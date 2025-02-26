@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert, TouchableWithoutFeedback, Image  } from 'react-native';
+import { View, Text, Button,Modal, StyleSheet,Animated, ScrollView, TouchableOpacity, TextInput,  Alert, TouchableWithoutFeedback, Image, KeyboardAvoidingView, Platform  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ipAddress from '../config';
@@ -206,6 +206,11 @@ const [playingWayTrixService, setPlayingWayTrixService] = useState(null);
   
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
     <LinearGradient
           colors={['#3F63CB', '#003266', '#000000']}
           style={styles.gradientContainer}
@@ -525,6 +530,7 @@ const [playingWayTrixService, setPlayingWayTrixService] = useState(null);
       </TouchableWithoutFeedback>
     </ScrollView>
     </LinearGradient>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -539,6 +545,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
+    paddingBottom: 80
     // top: 20,
     // backgroundColor: '#757575', // Background color changed to black
   },
@@ -583,7 +590,7 @@ const styles = StyleSheet.create({
     color: 'white',
     minHeight: 50,
     width: '100%',
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
   },
   questionContainer: {
     // marginBottom: 10,

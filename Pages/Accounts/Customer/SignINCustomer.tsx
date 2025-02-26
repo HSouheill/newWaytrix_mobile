@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ForgotPass from './ForgotPass';  
 import SignInUpCustomer from './SignUpCustomer';
 import ValetScreen from '../Valet/ValetScreen';
-import bonus from '../../Bonus/bonus';
+import bonus from '../../Bonus/BonusScreen';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import HomeScreen from '../../HomeScreen';
 
@@ -17,9 +17,9 @@ import HomeScreen from '../../HomeScreen';
 type RootStackParamList = {
   ValetScreen: { username: string } | undefined;
   bonus: undefined;
-  SignInUpCustomer: undefined;
-  ForgotPass: undefined;
-  SignIn: undefined;
+  SignInUpCustomer: { source?: string } | undefined;
+  ForgotPass: { source?: string } | undefined;
+  SignIn: { source?: string } | undefined;
   HomeScreen: undefined;
 };
 
@@ -46,9 +46,6 @@ const clearAuthData = async () => {
     // Clear any cached credentials
     if (Platform.OS === 'web') {
       // For web platform
-
-
-
       const inputs = document.querySelectorAll('input');
       inputs.forEach(input => {
         input.value = '';
@@ -61,13 +58,14 @@ const clearAuthData = async () => {
 };
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
+  const [usernameOrPhone, setUsernameOrPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
-  // const navigation = useNavigation();
+  const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
   const params = route.params as RouteParams;
+  const source = params?.source || 'bonus'; // Default to 'bonus' if no source provided
+
 
     
   useEffect(() => {
@@ -77,13 +75,18 @@ const SignIn = () => {
 
 
   const handleSignIn = async () => {
+    if (!usernameOrPhone || usernameOrPhone.trim() === '') {
+      alert('Username or Phone Number is required');
+      return;
+    }
+    
     if (password.trim().length < 8) {
       alert('Password must be at least 8 characters');
       return;
     }
   
     const userData = {
-      email,
+      usernameOrPhone,
       password,
       role: "customer",
     };
@@ -121,10 +124,10 @@ const SignIn = () => {
         console.log('Navigating to bonus screen');
       }
   
-      // Start the logout timer (3 minutes)
+      // Start the logout timer (5 minutes)
       setTimeout(async () => {
         await logoutUser();
-      }, 300000);
+      }, 30000);
     } catch (error) {
       console.error('Error signing in:', error);
       await clearAuthData();
@@ -164,12 +167,12 @@ const SignIn = () => {
         <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
         <Text style={styles.title}>Log In</Text>
         <View style={styles.formcontainer}>
-        <Text style={styles.usenameLabel}>Email or Username</Text>
+        <Text style={styles.usenameLabel}>Username or Phone Number</Text>
 
         <TextInput
-          placeholder="Email or Username"
-          value={email}
-          onChangeText={setEmail}
+          placeholder="Username or Phone Number"
+          value={usernameOrPhone}
+          onChangeText={setUsernameOrPhone}
           style={styles.input}
           placeholderTextColor="#CCCCCC"
           autoComplete="off"
@@ -190,9 +193,6 @@ const SignIn = () => {
               <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#000000" />
         </TouchableOpacity>
       </View>
-      {/* <TouchableOpacity onPress={handleSignIn} style={styles.button}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity> */}
       <View style={{ width: '100%', alignItems: 'flex-start' }}>
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
             <Text style={styles.forgetpassword}>Forgot Password?</Text>
@@ -200,10 +200,7 @@ const SignIn = () => {
         </View>
       </View>
         
-        {/* <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity onPress={handleSignIn}  style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleSignIn} style={styles.buttonContainer}>
           <LinearGradient
             colors={['#3F63CB', '#679BFF']}
             style={styles.button}
@@ -214,13 +211,10 @@ const SignIn = () => {
           </LinearGradient>
         </TouchableOpacity>
        
-        {/* <View style={styles.signUpTextContainer}> */}
-        <TouchableOpacity onPress={() => navigation.navigate('SignInUpCustomer')}>
+        <TouchableOpacity onPress={() => navigation.navigate('SignInUpCustomer', { source: source })}>
           <Text style={styles.baseText}>Don't have an account yet?</Text>
           <Text style={styles.linkText}>Sign Up</Text>
         </TouchableOpacity>
-
-        {/* </View> */}
     
     </View>
     </ImageBackground>

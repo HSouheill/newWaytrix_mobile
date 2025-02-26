@@ -4,25 +4,28 @@ import { LinearGradient } from 'expo-linear-gradient';
 import CustomHeader from '../../layout/CustomHeader'; 
 // import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
-import updateAccount from './update';
+import UpdateAccount from './Update';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ipAddress from '../../config';
+import { Navigate } from 'react-router-native';
+import BonusScreen from '../Bonus/BonusScreen';
+import ValetScreen from '../OrderScreen/ValetScreen';
 
 type profileRouteProp = RouteProp<{
-  profile: {
+  Profile: {
     username?: string;
     verified?: boolean;
   };
 }>;
 
 type RootStackParamList = {
-  profile: { username: string } | undefined;
+  Profile: { username: string } | undefined;
 };
 
-const profile = () => {
+const Profile = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [username, setUsername] = useState('');
   const [verified, setVerified] = useState(false);
@@ -31,6 +34,9 @@ const profile = () => {
   const [email, setEmail] = useState('');
   const [userId, setUserId] = useState('');;
   const navigation = useNavigation();
+  const route = useRoute();
+  const { fromScreen } = route.params || {}; // Destructure fromScreen from route parameters
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -38,8 +44,8 @@ const profile = () => {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
           const parsed = JSON.parse(userData);
-          +
           setUsername(parsed.username);
+          // Make sure you're using the right property from userData
           setVerified(parsed.isVerified);
           setEmail(parsed.email);
           setUserId(parsed._id);
@@ -51,7 +57,6 @@ const profile = () => {
     
     fetchUserData();
   }, []);
-  
 
   // const handleVerification = async () => {
   //   setLoading(true);
@@ -77,13 +82,13 @@ const profile = () => {
     try {
       const token = await AsyncStorage.getItem('customerToken');
       if (!token) return;
-
+  
       const response = await axios.get(`${ipAddress}/api/auth/checkVerification`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-
+  
       if (response.data.isVerified) {
         setVerified(true);
         // Update AsyncStorage with new verification status
@@ -152,6 +157,16 @@ const profile = () => {
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);  // Toggle the state
       };
+
+      const handleBackButton = () => {
+        if (fromScreen === 'BonusScreen') {
+          navigation.navigate('BonusScreen');
+        } else if (fromScreen === 'ValetScreen') {
+          navigation.navigate('ValetScreen');
+        } else {
+          navigation.goBack(); // Fallback to the previous screen
+        }
+      };
   return (
             <LinearGradient
             colors={['#3F63CB', '#003266', '#000000']}
@@ -165,7 +180,7 @@ const profile = () => {
         <View style={styles.profileContainer}>
     <Text style={styles.title}>Manage Account</Text>
     <View style={styles.buttonsContainer}>
-    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('updateAccount')}>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UpdateAccount')}>
           <View style={styles.updateAccount}>
             <Text style={styles.buttonText}>Update Account</Text>
             <Ionicons name="chevron-down" size={20} color="white"   style={{
@@ -174,21 +189,32 @@ const profile = () => {
           </View>
         </TouchableOpacity>
         {!verified && (
-              <TouchableOpacity 
-                style={styles.button} 
-                onPress={sendVerificationEmail}
-                disabled={loading}
-              >
-                <View style={styles.updateAccount}>
-                  <Text style={styles.buttonText}>
-                    {loading ? 'Sending...' : 'Verify Account'}
-                  </Text>
-                  {loading && <ActivityIndicator size="small" color="white" />}
-                </View>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={sendVerificationEmail}
+              disabled={loading}
+            >
+              <View style={styles.updateAccount}>
+                <Text style={styles.buttonText}>
+                  {loading ? 'Sending...' : 'Verify Account'}
+                </Text>
+                {loading && <ActivityIndicator size="small" color="white" />}
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
     </View>
+
+    <TouchableOpacity onPress={handleBackButton}  style={styles.submitButton}>
+         <LinearGradient
+                         colors={['#3F63CB', '#679BFF']}
+                         style={styles.backbutton}
+                         start={{ x: 0, y: 0 }}
+                         end={{ x: 1, y: 0 }}
+                       >
+           <Text style={styles.submitButtonText}>Back</Text>
+        </LinearGradient>
+         </TouchableOpacity>
      {/* Verification Modal */}
 
                     <Modal
@@ -308,8 +334,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  submitButton: {
+    width: 200,
+    height: 53,
+    borderRadius: 10,
+    overflow: 'hidden', // Ensures the gradient does not spill outside the border radius
+    marginBottom: 100,
+    alignSelf: 'center',
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  backbutton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10, // Ensure that the gradient follows this border radius
+  },
 });
 
-export default profile;
+export default Profile;
 
 

@@ -11,11 +11,11 @@ import ValetScreen from './Pages/OrderScreen/ValetScreen'
 import MenuScreen from './Pages/OrderScreen/MenuScreen'
 import SurveyScreen from './Pages/SurveyScreen'
 import ContactUsScreen from './Pages/ContactUsScreen/ContactUsScreen'
-import BonusScreen from './Pages/Bonus/bonus'
+import BonusScreen from './Pages/Bonus/BonusScreen'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SignInUpCustomer from './Pages/Accounts/Customer/SignUpCustomer';
 import SignIn from './Pages/Accounts/Customer/SignINCustomer';
-import login from './Pages/Accounts/Customer/login';
+import Login from './Pages/Accounts/Customer/Login';
 import ForgotPass from './Pages/Accounts/Customer/ForgotPass';
 import TableSignIN from './Pages/Accounts/Table/TableSignIn';
 import TableLogout from './Pages/Accounts/Table/TableLogout'
@@ -31,12 +31,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Change_password from './Pages/Accounts/Customer/Change_password';
 import ResetPass from './Pages/Accounts/Customer/ResetPass';
-import valetstartingpage from './Pages/OrderScreen/valet_starting_page';
-import bonus from './Pages/Bonus/bonus';
+import Valetstartingpage from './Pages/OrderScreen/Valetstartingpage';
+import bonus from './Pages/Bonus/BonusScreen';
 import { LinearGradient } from 'expo-linear-gradient';
-import profile from './Pages/profile/profile';
-import updateAccount from './Pages/profile/update';
-import changePassword from './Pages/profile/changePassword';
+import Profile from './Pages/profile/Profile';
+import UpdateAccount from './Pages/profile/Update';
+import ChangePassword from './Pages/profile/ChangePassword';
 import DiningExperience from './Pages/Diningexperience'
 import { createStackNavigator } from '@react-navigation/stack';
 import { registerRootComponent } from 'expo';
@@ -165,18 +165,18 @@ setTableToken(tableToken);
     return () => clearInterval(intervalId);
   }, [currentRouteName]);
 
-  // const resetTimeout = () => {
-  //   if (timeoutRef.current) {
-  //     clearTimeout(timeoutRef.current);
-  //   }
-  //   timeoutRef.current = setTimeout(() => {
-  //     if (navigationRef.current && !valetToken ) {
-  //       (currentRouteName ==='BonusScreen' || currentRouteName === 'CarTimer') ? console.log('NOTTTTTTTTTTTTTTTTTTT we have not navigated to advertisement screen')
-  //       :
-  //       navigationRef.current.navigate('Home');
-  //     }
-  //   }, 60000);
-  // };
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      if (navigationRef.current && !valetToken ) {
+        (currentRouteName ==='BonusScreen' || currentRouteName === 'CarTimer') ? console.log('NOTTTTTTTTTTTTTTTTTTT we have not navigated to advertisement screen')
+        :
+        navigationRef.current.navigate('Home');
+      }
+    }, 60000);
+  };
   type RootStackParamList = {
     SignIn: undefined;
     ForgotPass: undefined;
@@ -218,11 +218,11 @@ setTableToken(tableToken);
 
   const onPressScreen = () => {
     console.log('Pressed Successfully');
-    // resetTimeout();
+    resetTimeout();
   };
 
   useEffect(() => {
-    // resetTimeout();
+    resetTimeout();
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       return true; // Disable the back button
     });
@@ -278,12 +278,12 @@ setTableToken(tableToken);
                       <Drawer.Screen name="SignIn" component={SignIn} />
                       <Drawer.Screen name="SignInUpCustomer" component={SignInUpCustomer} />
                       <Drawer.Screen name="ResetPass" component={ResetPass} />
-                      <Drawer.Screen name="valetstartingpage" component={valetstartingpage} />
+                      <Drawer.Screen name="Valetstartingpage" component={Valetstartingpage} />
                       <Drawer.Screen name="Change_password" component={Change_password} />
                       <Drawer.Screen name="bonus" component={bonus} />
-                      <Drawer.Screen name="profile" component={profile} />  
-                      <Drawer.Screen name="updateAccount" component={updateAccount} />
-                      <Drawer.Screen name="changePassword" component={changePassword} />
+                      <Drawer.Screen name="Profile" component={Profile} />  
+                      <Drawer.Screen name="UpdateAccount" component={UpdateAccount} />
+                      <Drawer.Screen name="ChangePassword" component={ChangePassword} />
                       <Drawer.Screen name="DiningExperience" component={DiningExperience} />
                       <Drawer.Screen name="HomeScreen" component={HomeScreen} />
 
@@ -411,7 +411,7 @@ setTableToken(tableToken);
 
               <Drawer.Screen
                 name="BonusScreen"
-                component={login}
+                component={Login}
                 // options={{
                 //   header: ({ navigation }) => (
                 //     <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />

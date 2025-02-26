@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import images from '../assets/images';
-import profile from '../Pages/profile/profile'
+import Profile from '../Pages/profile/Profile'
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, Image } from 'react-native';
 import { NavigationContainer, useNavigation, DrawerActions } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions, useDrawerStatus } from '@react-navigation/drawer';
@@ -15,7 +15,7 @@ const CustomHeader = ({ username }) => {
   return (
 
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('profile')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             <View style={styles.userContainer}>
                 <Image source={images.profileLogo} style={styles.userIcon} />
                 <Text style={styles.username}>{username}</Text>

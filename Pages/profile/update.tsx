@@ -3,7 +3,7 @@ import { StyleSheet, View, Text,TextInput, TouchableOpacity, Alert, ImageBackgro
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomHeader from '../../layout/CustomHeader'; 
 import { Ionicons } from '@expo/vector-icons'; 
-import changePassword from './changePassword';
+import ChangePassword from './ChangePassword';
 import axios from 'axios';
 import ipAddress from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +17,7 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 
 
-const updateAccount = () => {
+const UpdateAccount = () => {
     const [phonenb, setphonenb] = useState('');
     const [email, setemail] = useState('');
     const navigation = useNavigation();
@@ -27,7 +27,7 @@ const updateAccount = () => {
     const [isCountryPickerVisible, setIsCountryPickerVisible] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);  // State to track expand/collapse
     const [username, setUsername] = useState<string>('');
-    const route = useRoute<RouteProp<{ updateAccount: { username?: string } }>>();
+    const route = useRoute<RouteProp<{ UpdateAccount: { username?: string } }>>();
     
 
     useEffect(() => {
@@ -423,7 +423,7 @@ const updateAccount = () => {
             </TouchableOpacity>
     
 
-        <TouchableOpacity style={styles.changepass} onPress={() => navigation.navigate('changePassword')}>
+        <TouchableOpacity style={styles.changepass} onPress={() => navigation.navigate('ChangePassword')}>
               <View style={styles.updateAccount}>
                 <Text style={styles.changepasstext}>Change Password</Text>
                 <Ionicons name="chevron-down" size={20} color="white"   style={{
@@ -653,6 +653,6 @@ const styles = StyleSheet.create({
 
 });
 
-export default updateAccount;
+export default UpdateAccount;
 
 

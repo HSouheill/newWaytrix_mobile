@@ -6,7 +6,7 @@ import SignInUpCustomer from './SignUpCustomer';
 import { useNavigation } from '@react-navigation/native';
 
 
-const login = () => {
+const Login = () => {
     const navigation = useNavigation();
   
   return (
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default login;
+export default Login;

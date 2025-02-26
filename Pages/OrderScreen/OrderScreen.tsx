@@ -9,7 +9,7 @@ import { SvgUri } from 'react-native-svg';
 import ipAddress from '../../config';
 import { debounce } from 'lodash';
 import { LinearGradient } from 'expo-linear-gradient';
-import valetstartingpage from './valet_starting_page'
+import valetstartingpage from './Valetstartingpage'
 import CustomHeader from '../../layout/CustomHeader'; 
 
 // import BillIcon from './svg/bill1.svg';
@@ -157,7 +157,7 @@ export default function SettingsScreen({ navigation }) {
               <Image source={require('../../assets/menu.png')} style={styles.image}/>
               <Text style={styles.bigButtonText}>MENU</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('valetstartingpage')}>
+            <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('Valetstartingpage')}>
               <Image source={require('../../assets/valet.png')} style={styles.image}/>
               <Text style={styles.bigButtonText}>VALET</Text>
             </TouchableOpacity>
@@ -215,14 +215,41 @@ export default function SettingsScreen({ navigation }) {
                   <Text style={styles.cardText}>Oil</Text>
                 </View>
               )}
-              {/* {customButtons.map((button) => (
+              {shishaCharcoal && (
+              <View style={styles.buttonColumn}>
+              <TouchableOpacity style={styles.card} onPress={() => handleOrder('shishaCharcoal')}>
+                <Ionicons name="flame" size={40} color="#fff" style={styles.icon} />
+              </TouchableOpacity>
+              <Text style={styles.cardText}>Shisha Charcoal</Text>
+
+              </View>
+    )}
+    {toothpick && (
+                    <View style={styles.buttonColumn}>
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('toothpick')}>
+        <Image source={require('./svg/toothpick.png')} style={styles.icon} />
+      </TouchableOpacity>
+      <Text style={styles.cardText}>Toothpick</Text>
+
+      </View>
+    )}
+    {ketchup && (
+                    <View style={styles.buttonColumn}>
+      <TouchableOpacity style={styles.card} onPress={() => handleOrder('ketchup')}>
+        <Image source={require('./svg/ketchup.png')} style={styles.icon} />
+      </TouchableOpacity>
+      <Text style={styles.cardText}>Ketchup</Text>
+
+      </View>
+    )}
+              {customButtons.map((button) => (
                 <View key={button._id} style={styles.buttonColumn}>
                   <TouchableOpacity style={styles.card} onPress={() => handleOrder(button.order)}>
                     <SvgUri width="50" height="50" uri={button.svgLink} />
                   </TouchableOpacity>
                   <Text style={styles.cardText}>{button.order}</Text>
                 </View>
-              ))} */}
+              ))}
             </View>
           </ScrollView>
   
@@ -276,36 +303,42 @@ const styles = StyleSheet.create({
   },
   buttonColumn: {
     alignItems: 'center',
-    width: '15%',
+    // Remove fixed width, use flex-basis instead
+    flexBasis: '18%', // Allows 5 buttons per row by default
+    maxWidth: '20%', // Ensures buttons don't grow too large
+    minWidth: 80, // Ensures buttons don't get too small
+    marginBottom: 20, // Add space between rows
   },
   buttonRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    gap: 30,
+    gap: 10, // Reduced gap for better spacing
+    alignItems: 'flex-start', // Align items to the start
   },
   card: {
     alignItems: 'center',
     justifyContent: 'center',
-      backgroundColor: 'rgba(49, 49, 49, 0.4)',
+    backgroundColor: 'rgba(49, 49, 49, 0.4)',
     padding: 10,
     borderRadius: 10,
-    width: '100%',
+    width: '70%', // Take full width of buttonColumn
     aspectRatio: 1,
-    // opacity: 0.8,
-    
+    minHeight: 80, // Minimum height for small screens
   },
   icon: {
-    width: '70%',  // Increased from fixed 40px
-    height: '70%', // Increased from fixed 40px
+    width: '70%',
+    height: '70%',
     tintColor: 'white',
-    resizeMode: 'contain' // Added to maintain aspect ratio
+    resizeMode: 'contain',
   },
   cardText: {
-    marginTop: 10,
-    fontSize: 16,
+    marginTop: 5, // Reduced margin for better spacing
+    fontSize: 14, // Slightly smaller font size
     color: '#fff',
     textAlign: 'center',
+    flexWrap: 'wrap', // Allow text to wrap
+    maxWidth: '100%', // Ensure text doesn't overflow
   },
   containerrow: {
     flexDirection: 'row',

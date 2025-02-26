@@ -46,7 +46,7 @@ const BonusWheelHeader = ({ username }) => {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.leftSection}>
-        <TouchableOpacity onPress={() => navigation.navigate('profile')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
           <View style={styles.userContainer}>
             <Image source={images.profileLogo} style={styles.userIcon} />
             <Text style={styles.username}>
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     zIndex: 1000,
     height: 90,
     alignItems: 'center',

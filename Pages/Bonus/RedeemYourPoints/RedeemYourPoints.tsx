@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView, Platform, StatusBar, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView, Platform, StatusBar, TouchableWithoutFeedback, ScrollView, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Vouchers from './Vouchers';
 import ipAddress from '../../../config';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomHeader from '../../../layout/CustomHeader';
+import BonusScreen from '../BonusScreen';
+import { useNavigation} from '@react-navigation/native';
+
 
 const RedeemYourPoints = () => {
   const [totalPoints, setTotalPoints] = useState(null);
   const [loading, setLoading] = useState(true);
   const [customerName, setCustomerName] = useState("");
+  const navigation = useNavigation();
+  
 
 
   useEffect(() => {
@@ -109,6 +114,16 @@ const RedeemYourPoints = () => {
               <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Vouchers />
+        <TouchableOpacity onPress={navigation.navigate(BonusScreen)}  style={styles.submitButton}>
+                 <LinearGradient
+                                 colors={['#3F63CB', '#679BFF']}
+                                 style={styles.backbutton}
+                                 start={{ x: 0, y: 0 }}
+                                 end={{ x: 1, y: 0 }}
+                               >
+                   <Text style={styles.submitButtonText}>Back</Text>
+                </LinearGradient>
+                 </TouchableOpacity>
       </ScrollView>
       </View>
       </View>
@@ -169,6 +184,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#ffffff',
     fontWeight: '600',
+  },
+  submitButton: {
+    width: 200,
+    height: 53,
+    borderRadius: 10,
+    overflow: 'hidden', // Ensures the gradient does not spill outside the border radius
+    marginBottom: 100,
+    alignSelf: 'center',
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  backbutton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10, // Ensure that the gradient follows this border radius
   },
 });
 

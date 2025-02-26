@@ -6,7 +6,7 @@ import SignInUpCustomer from '../Accounts/Customer/SignUpCustomer';
 import { useNavigation } from '@react-navigation/native';
 
 
-const valet_starting_page = () => {
+const Valetstartingpage = () => {
     const navigation = useNavigation();
   
   return (
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default valet_starting_page;
+export default Valetstartingpage;
