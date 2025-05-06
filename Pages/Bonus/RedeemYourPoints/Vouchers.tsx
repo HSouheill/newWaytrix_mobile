@@ -11,9 +11,11 @@ const Vouchers = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [itemmodalVisible, setItemModalVisible] = useState(false);
+  const [imagemodalVisible, setimagemodalVisible] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [userPoints, setUserPoints] = useState(0);
+  const [qrcodeModal, setQrcodeModal] = useState(false);
 
   const fetchUserPoints = async () => {
     try {
@@ -121,16 +123,21 @@ const Vouchers = () => {
       setTimeout(() => setErrorModal(false), 3000);
     }
   };
+  const handleCLickImage = (voucher) => {
+    setSelectedVoucher(voucher); // Set the selected voucher
+    setimagemodalVisible(true);
+  };
 
-  const renderCategoryHeader = (title) => (
-    <View style={styles.categoryHeader}>
-      <Text style={styles.categoryTitle}>{title}</Text>
-    </View>
-  );
+  // const renderCategoryHeader = (title) => (
+  //   <View style={styles.categoryHeader}>
+  //     <Text style={styles.categoryTitle}>{title}</Text>
+  //   </View>
+  // );
 
   const renderVoucherGrid = ({ item }) => (
     <View style={styles.cardWrapper}>
-      <View style={styles.card}>
+    <TouchableOpacity onPress={() => handleCLickImage(item)}>
+    <View style={styles.card}>
         <View style={styles.discountBadge}>
           <Text style={styles.discountText}>{item.discount}% Off</Text>
         </View>
@@ -138,6 +145,7 @@ const Vouchers = () => {
           <Image source={{ uri: item.image }} style={styles.logo} />
         </View>
       </View>
+      </TouchableOpacity>
       <TouchableOpacity
         style={[
           styles.redeemButton,
@@ -164,7 +172,7 @@ const Vouchers = () => {
 
   const renderCategory = (category, items) => (
     <View style={styles.categorySection}>
-      {renderCategoryHeader(category)}
+      {/* {renderCategoryHeader(category)} */}
       <View style={styles.gridContainer}>
         {items.map((item, index) => (
           <View key={item._id || index} style={styles.gridItem}>
@@ -190,6 +198,16 @@ const Vouchers = () => {
     acc[voucher.category].push(voucher);
     return acc;
   }, {});
+
+  const handleqrcode = (partner) => {
+    setSelectedVoucher(partner);
+    // setModalVisible(true);
+    setQrcodeModal(true);
+    setTimeout(() => {
+      setQrcodeModal(false);
+      setimagemodalVisible(false);
+    }, 10000);
+  };
 
   return (
     <TouchableWithoutFeedback>
@@ -301,6 +319,69 @@ const Vouchers = () => {
             </LinearGradient>
           </View>
         </Modal>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={imagemodalVisible}
+          onRequestClose={() => setimagemodalVisible(false)}
+        >
+          <View style={styles.modalBackground}>
+            <LinearGradient
+              colors={['#000000', '#003266']}
+              style={styles.modalContent}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              <TouchableOpacity 
+                style={styles.closeButton} 
+                onPress={() => setimagemodalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+              
+              <Text style={styles.modalTitle}>Voucher</Text>
+              
+              {selectedVoucher && (
+                <View style={styles.partnerDetails}>
+                  <Image 
+                    source={{ uri: selectedVoucher.image }}
+                    style={styles.modalLogo}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.detailsContainer}>
+                      <Text style={styles.detailText}> The voucher’s information will be sent to the email {selectedVoucher.email}</Text>
+                    
+                  </View>
+                  <TouchableOpacity style={styles.socialButton} onPress={() => handleqrcode(selectedVoucher)}>
+                                    <Text style={styles.socialButtonText}>Tap to scan for socials!</Text>
+                                  </TouchableOpacity>
+                </View>
+              )}
+            </LinearGradient>
+          </View>
+        </Modal>
+        <Modal
+                animationType="fade"
+                transparent={true}
+                visible={qrcodeModal}
+                onRequestClose={() => setQrcodeModal(false)}
+              >
+                <View style={styles.qrModalBackground}>
+                  <LinearGradient
+                    colors={['#000000', '#003266']}
+                    style={styles.qrModal}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                  >
+                    
+                    <View style={styles.qrModalContent}>
+                      <Text style={styles.modalTitle}>Socials</Text>
+                      {/* <Image source={{ uri: selectedPartner.qrCodeImage }} style={styles.qrImage} /> */}
+                    </View>
+                  </LinearGradient>
+                </View>
+              </Modal>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -507,6 +588,36 @@ const styles = StyleSheet.create({
   detailText: {
     color: 'white',
     fontSize: 14,
+  },
+  socialButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+  },
+  socialButtonText: {
+    color: 'white',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+  },
+  qrModalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qrModal: {
+    width: '90%',
+    maxWidth: 250,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center'
+  },
+  qrModalContent: {
+    width: 200,
+    height: 250,
+    borderRadius: 20,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

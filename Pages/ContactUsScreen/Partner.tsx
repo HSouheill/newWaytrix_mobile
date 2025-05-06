@@ -48,29 +48,32 @@ const Partner = () => {
   };
 
   const handleqrcode = (partner) => {
+    if (!partner) {
+      console.error("Attempted to show QR code for null partner");
+      return;
+    }
+    
     setSelectedPartner(partner);
-    setModalVisible(true);
-    setQrcodeModal(true);
+    
+    // Add a small delay to ensure selectedPartner is set before opening the modal
     setTimeout(() => {
-      setQrcodeModal(false);
-      setModalVisible(false);
-    }, 4000);
+      setQrcodeModal(true);
+      setModalVisible(true);
+      
+      // Auto-close after 10 seconds
+      setTimeout(() => {
+        setQrcodeModal(false);
+        setModalVisible(false);
+      }, 10000);
+    }, 100);
   };
 
-//   const fetchQrCode = async () => {
-//     try {
-//         const response = await axios.get(`${ipAddress}/api/ContactUsRoutes/getQrCode`, {
-//             headers: {
-//                 'Authorization': localStorage.getItem('waytrixToken')
-//             }
-//         });
-//         if (response.data.qrCodeImage) {
-//             setPreviewUrl(response.data.qrCodeImage);
-//         }
-//     } catch (error) {
-//         console.error('Error fetching QR code:', error);
-//     }
-// };
+  useEffect(() => {
+    if (selectedPartner) {
+      console.log("Selected partner set:", selectedPartner.name);
+      console.log("QR code URL:", selectedPartner.qrCodeImage);
+    }
+  }, [selectedPartner]);
 
   return (
     <View style={styles.container}>
@@ -78,11 +81,12 @@ const Partner = () => {
         {partners.map((partner, index) => (
           <View key={index} style={styles.partnerCard}>
             <View style={styles.logoContainer}>
-              <Image 
-                source={{ uri: partner.logo }} 
-                style={styles.logo}
-                resizeMode="contain"
-              />
+            <Image 
+              source={{ uri: partner.logo }} 
+              style={styles.logo}
+              resizeMode="contain"
+              onError={(e) => console.error('Image loading error:', e.nativeEvent.error, partner.logo)}
+            />
             </View>
 
             <TouchableOpacity onPress={() => handleViewDetails(partner)}>
@@ -149,26 +153,30 @@ const Partner = () => {
       </Modal>
 
       <Modal
-        animationType="fade"
-        transparent={true}
-        visible={qrcodeModal}
-        onRequestClose={() => setQrcodeModal(false)}
-      >
-        <View style={styles.qrModalBackground}>
-          <LinearGradient
-            colors={['#000000', '#003266']}
-            style={styles.qrModal}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-          >
-            
-            <View style={styles.qrModalContent}>
-              <Text style={styles.modalTitle}>Socials</Text>
-              {/* <Image source={{ uri: selectedPartner.qrCodeImage }} style={styles.qrImage} /> */}
-            </View>
-          </LinearGradient>
-        </View>
-      </Modal>
+  animationType="fade"
+  transparent={true}
+  visible={qrcodeModal}
+  onRequestClose={() => setQrcodeModal(false)}
+>
+  <View style={styles.qrModalBackground}>
+    <LinearGradient
+      colors={['#000000', '#003266']}
+      style={styles.qrModal}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      <View style={styles.qrModalContent}>
+        <Text style={styles.modalTitle}>Socials</Text>
+        {selectedPartner && selectedPartner.qrCodeImage && (
+          <Image source={{ uri: selectedPartner.qrCodeImage }} style={styles.qrImage} />
+        )}
+        {selectedPartner && !selectedPartner.qrCodeImage && (
+          <Text style={{color: 'white'}}>No QR code available</Text>
+        )}
+      </View>
+    </LinearGradient>
+  </View>
+</Modal>
     </View>
   );
 };
@@ -179,8 +187,6 @@ const cardWidth = (windowWidth - 60) / 3;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#001220',
-    // padding: 15,
   },
   title: {
     fontSize: 28,
@@ -193,8 +199,8 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    // paddingHorizontal: 5,
+    justifyContent: 'flex-start', // Changed from space-between to flex-start
+    gap: 10, // Added gap for consistent spacing
   },
   partnerCard: {
     width: cardWidth,
@@ -205,7 +211,7 @@ const styles = StyleSheet.create({
     width: cardWidth - 20,
     height: cardWidth - 50,
     backgroundColor: 'rgba(49, 49, 49, 0.4)',
-  borderRadius: 10,
+    borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     justifyContent: 'center',
@@ -226,50 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  // partnersContainer: {
-  //   width: '100%',
-  //   marginBottom: 20,
-  // },
-  // contentContainer: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   gap: 20,
-  //   marginTop: 10,
-  //   marginBottom: 10,
-  // },
-  // partnerCard: {
-  //   backgroundColor: 'rgba(49, 49, 49, 0.4)',
-  //   borderRadius: 10,
-  //   padding: 20,
-  //   width: 160,
-  //   alignItems: 'center',
-  // },
-  // partnerImage: {
-  //   width: 150,
-  //   height: 80,
-  //   resizeMode: 'contain',
-  // },
-  // buttonsContainer: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   gap: 20,
-  //   paddingHorizontal: 20,
-  //   marginBottom: 20,
-  // },
-  // viewDetailsButton: {
-  //   backgroundColor: '#3F63CB',
-  //   paddingHorizontal: 20,
-  //   paddingVertical: 10,
-  //   borderRadius: 10,
-  //   width: 160,
-  // },
-  // viewDetailsText: {
-  //   color: 'white',
-  //   textAlign: 'center',
-  //   fontSize: 16,
-  // },
   modalBackground: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -345,21 +307,19 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center'
   },
-    qrModalContent: {
-    width: 200, // Decreased width
-    height: 250, // Keeping the height the same
-    // backgroundColor: 'white',
+  qrModalContent: {
+    width: 200,
+    height: 250,
     borderRadius: 20,
-    padding: 10, // Adjust padding if necessary
+    padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   qrImage: {
-    width: 180, // Adjust the image width to fit the new modal size
-    height:180, // Adjust the image height if necessary
+    width: 180,
+    height: 180,
     resizeMode: 'contain',
   },
 });
 
 export default Partner;
-

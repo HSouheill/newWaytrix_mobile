@@ -225,21 +225,20 @@ const ChangePassword = () => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    // backgroundColor: '#000066',
-    alignItems: 'center',
-    justifyContent: 'center',
+
     
   },
   container: {
     flex: 1,
-    top: '2%',
+    padding: 10,
+
   },
   content: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    padding: 20,
-    top: '5%',
+    // justifyContent: 'flex-start',
+    padding: 10,
+    top: '15%',
     gap: 15,
   },
   updateAccount: {

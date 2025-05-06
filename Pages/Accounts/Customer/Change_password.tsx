@@ -77,7 +77,7 @@ const Change_password = () => {
   return (
     <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
     <View style={styles.container}>
-      <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
+      <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image}/>
       <Text style={styles.title}>Change Password</Text>
       <View style={styles.formcontainer}>
         <Text style={styles.label}>New Password</Text>

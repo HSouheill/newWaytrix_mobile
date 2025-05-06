@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { Video } from 'expo-av';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,48 +34,53 @@ export default function HomeScreen({ navigation }) {
     });
   }, [navigation, showHeader]);
 
-  const fetchMedia = async () => {
-    try {
-      const tableId = await AsyncStorage.getItem('tableId');
-      const tableToken = await AsyncStorage.getItem('tableToken');
-      console.log(tableId);
-      console.log(tableToken);
-      const response = await axios.post(
-        `${ipAddress}/api/VideoRoutes/GetOneVideo`,
-        { tableId: tableId },
-        { headers: { Authorization: tableToken } }
-      );
-      const url = response.data.videoURL;
-      // console.log(response.data.videoURL);
-      // console.log(JSON.stringify(response))
-      //the video creates entries in the database according to every table and plays them differently on
-      //different tables
-
-      if (url.endsWith('.mp4')) {
-        setIsVideo(true);
-        setMediaURL(url);
-        if (videoRef.current) {
-          videoRef.current.setStatusAsync({ shouldPlay: true, positionMillis: 0 });
-        }
-      } else if (url) {
-        setIsVideo(false);
-        setMediaURL(url);
-        setTimeout(fetchMedia, 10000); // Fetch new media after 10 seconds if it's an image
-      } else {
-        // No media URL received, display the local image
-        setIsVideo(false);
-        setMediaURL(require('../Pages/waytrix.png'));//setMediaURL(LocalImage);
-        setTimeout(fetchMedia, 10000); // Fetch new media after 10 seconds
-      }
-    } catch (error) {
-      //console.error('Error fetching media:', error);
-      // In case of an error, display the local image
-      //this error appears also when the video for current table has been deleted from the DB
+  // In HomeScreen.tsx, modify your fetchMedia function to properly handle the video URL
+const fetchMedia = async () => {
+  try {
+    const tableId = await AsyncStorage.getItem('tableId');
+    const tableToken = await AsyncStorage.getItem('tableToken');
+    
+    const response = await axios.post(
+      `${ipAddress}/api/VideoRoutes/GetOneVideo`,  // Make sure this matches your route
+      { tableId: tableId },
+      { headers: { Authorization: tableToken } }
+    );
+    
+    // Log the full response to debug
+    console.log("Media response:", JSON.stringify(response.data));
+    
+    const url = response.data.videoURL;
+    
+    if (!url) {
+      console.log("No media URL received");
       setIsVideo(false);
-      setMediaURL(require('../Pages/waytrix.png'));//setMediaURL(LocalImage);
-      setTimeout(fetchMedia, 10000); // Retry fetching new media after 10 seconds
+      setMediaURL(require('../assets/newlogo_waytrix.png'));
+      setTimeout(fetchMedia, 10000);
+      return;
     }
-  };
+    
+    // Make sure URL is properly formatted
+    const formattedUrl = url.startsWith('http') ? url : `${ipAddress}${url.startsWith('/') ? '' : '/'}${url}`;
+    console.log("Formatted URL:", formattedUrl);
+    
+    if (formattedUrl.endsWith('.mp4')) {
+      setIsVideo(true);
+      setMediaURL(formattedUrl);
+      if (videoRef.current) {
+        videoRef.current.setStatusAsync({ shouldPlay: true, positionMillis: 0 });
+      }
+    } else {
+      setIsVideo(false);
+      setMediaURL(formattedUrl);
+      setTimeout(fetchMedia, 10000);
+    }
+  } catch (error) {
+    console.error('Error fetching media:', error.message, error?.response?.data);
+    setIsVideo(false);
+    setMediaURL(require('../assets/newlogo_waytrix.png'));
+    setTimeout(fetchMedia, 10000);
+  }
+};
 
   React.useEffect(() => {
     fetchMedia();
@@ -91,8 +96,19 @@ export default function HomeScreen({ navigation }) {
     }
   }, [showHeader]);
 
+  // Improve the playback status handler
   const handlePlaybackStatusUpdate = async (playbackStatus) => {
+    console.log("Playback status:", JSON.stringify(playbackStatus));
+    
+    if (playbackStatus.error) {
+      console.error("Playback error:", playbackStatus.error);
+      Alert.alert('Video Playback Error', 'Could not play the video. Trying another media.');
+      fetchMedia();
+      return;
+    }
+    
     if (playbackStatus.didJustFinish) {
+      console.log("Video finished, fetching new media");
       fetchMedia();
     }
   };
@@ -102,42 +118,50 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-        <LinearGradient
+    <View style={styles.container}>
+      <LinearGradient
         colors={['#3F63CB', '#003266', '#000000']}
         locations={[0, 0.4895, 0.9789]}
-        style={styles.container}
-      >
-    <TouchableOpacity activeOpacity={1} onPress={toggleHeaderVisibility} style={styles.container}>
-      <GetRestoId />
-      {mediaURL && isVideo ? (
-        <Video
-          ref={videoRef}
-          source={{ uri: mediaURL }}
-          rate={1.0}
-          volume={1.0}
-          isMuted={true}
-
-          // resizeMode="cover"
-          shouldPlay
-          isLooping={false}
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-          style={styles.video}
-        />
-      ) : (
-        mediaURL && <Image source={typeof mediaURL === 'string' ? { uri: mediaURL } : mediaURL} style={styles.image} />
-      )}
-    </TouchableOpacity>
-    </LinearGradient>
+        style={styles.backgroundGradient}
+      />
+      <TouchableOpacity activeOpacity={1} onPress={toggleHeaderVisibility} style={styles.contentContainer}>
+        <GetRestoId />
+        {mediaURL && isVideo ? (
+          <Video
+            ref={videoRef}
+            source={{ uri: mediaURL }}
+            rate={1.0}
+            volume={1.0}
+            isMuted={true}
+            shouldPlay
+            resizeMode="cover"
+            isLooping={false}
+            onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+            style={styles.video}
+          />
+        ) : (
+          mediaURL && <Image source={typeof mediaURL === 'string' ? { uri: mediaURL } : mediaURL} style={styles.image} />
+        )}
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  contentContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40, // FOR FOOTER
-    // backgroundColor: 'rgba(113, 176, 58, 0.5)', // Semi-transparent background
   },
   video: {
     position: 'absolute',
@@ -149,6 +173,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
+    
   },
 });

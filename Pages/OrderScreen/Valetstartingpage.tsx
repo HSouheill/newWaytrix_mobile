@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import SignIn from '../Accounts/Customer/SignINCustomer'
 import SignInUpCustomer from '../Accounts/Customer/SignUpCustomer';
 import { useNavigation } from '@react-navigation/native';
-
+import Valetsignin from './Valetsignin'
 
 const Valetstartingpage = () => {
     const navigation = useNavigation();
@@ -12,13 +12,13 @@ const Valetstartingpage = () => {
   return (
     <ImageBackground source={require('../../assets/background.png')} style={styles.backgroundContainer}>
     <View style={styles.container}>
-    <Image source={require('../../assets/logo1.png')} style={styles.image}/>
+    <Image source={require('../../assets/newlogo_waytrix.png')} style={styles.image}/>
       {/* <StatusBar barStyle="light-content" backgroundColor="#000066" /> */}
       <Text style={styles.title}>Your Car is</Text>
       <Text style={styles.title}>"JUST"</Text>
       <Text style={styles.title}>a Login Away</Text>
 
-      <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('SignIn', { source: 'valet' })}>
+      <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Valetsignin')}>
                 <LinearGradient
                   colors={['#3F63CB', '#679BFF']}
                   style={styles.button}
@@ -51,16 +51,17 @@ const styles = StyleSheet.create({
     top: '-15%',
   },
   image: {
-    width: 170,
-    height: 170,
+    // width: 170,
+    height: 130,
     top: '-7%',
+    resizeMode: 'contain'
   },
   title: {
     color: 'white',
     fontSize: 30,
     fontWeight: 'bold',
     // marginBottom: 20,
-    top: '-5%',
+    top: '-4%',
     textAlign: 'center',
   },
   buttonContainer: {

@@ -460,15 +460,12 @@ const UpdateAccount = () => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    // backgroundColor: '#000066',
-    alignItems: 'center',
-    justifyContent: 'center'
+
   },
   container: {
     flex: 1,
-    top: '2%',
-    
-    
+    padding: 10,
+
   },
   inputWrapper: {
     flex: 1,
@@ -479,7 +476,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 20,
-    top: '5%',
+    top: '15%',
     gap: 5,
   },
   updateAccount: {

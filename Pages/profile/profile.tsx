@@ -251,10 +251,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+     padding: 10,
+
     // width: '100%',
     // alignItems: 'center',
     // justifyContent: 'center',
-    top: '2%',
+    // top: '2%',
     // backgroundColor: '#000066',
   },
   profileContainer: {

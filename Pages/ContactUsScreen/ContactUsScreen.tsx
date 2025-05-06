@@ -6,6 +6,8 @@ import Partners from './Partner';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import ipAddress from '../../config';
 import { LinearGradient } from 'expo-linear-gradient';
+import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 const ContactUsScreen = () => {
   const [name, setName] = useState('');
@@ -99,6 +101,10 @@ const ContactUsScreen = () => {
       style={styles.container}
     >
       {/* Main ScrollView wrapper */}
+      <Image 
+            source={require('../../assets/newlogo_waytrix.png')} 
+            style={styles.logo} 
+          />
       <ScrollView
         bounces={false}
         style={styles.scrollViewMain}
@@ -107,14 +113,13 @@ const ContactUsScreen = () => {
         scrollEventThrottle={16}
         keyboardShouldPersistTaps="handled"
         overScrollMode="never"
+        horizontal={false}
+        directionalLockEnabled={true} // This locks scrolling to one direction
       >
      <TouchableWithoutFeedback>
         
         <View style={styles.innerContainer}>
-          <Image 
-            source={require('../../assets/logo1.png')} 
-            style={styles.logo} 
-          />
+          
           
           <View style={styles.formContainer}>
             <Text style={styles.title}>Reach Us</Text>
@@ -222,17 +227,20 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-    width: '100%',
+    // top: '3%'
   },
   formContainer: {
     padding: 20,
     paddingBottom: 40,
   },
   logo: {
-    width: 90,
+    width: 300,
     height: 90,
     alignSelf: 'center',
-    marginVertical: 30,
+    resizeMode: 'contain',
+    marginTop : '5%',
+    // marginBottom: '10%'
+    // marginVertical: 30,
   },
   title: {
     fontSize: 24,
@@ -265,7 +273,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   buttonContainer: {
-    alignItems: 'center',
+    width: 150,
+    alignSelf: 'center',
   },
   button: {
     width: 150,   

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, TouchableWithoutFeedback, StatusBar, BackHandler } from 'react-native';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, TouchableWithoutFeedback, StatusBar, BackHandler,Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer, NavigationContainerRef, NavigationProp } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
@@ -32,7 +32,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Change_password from './Pages/Accounts/Customer/Change_password';
 import ResetPass from './Pages/Accounts/Customer/ResetPass';
 import Valetstartingpage from './Pages/OrderScreen/Valetstartingpage';
-import bonus from './Pages/Bonus/BonusScreen';
+import Bonus from './Pages/Bonus/BonusScreen';
 import { LinearGradient } from 'expo-linear-gradient';
 import Profile from './Pages/profile/Profile';
 import UpdateAccount from './Pages/profile/Update';
@@ -40,8 +40,9 @@ import ChangePassword from './Pages/profile/ChangePassword';
 import DiningExperience from './Pages/Diningexperience'
 import { createStackNavigator } from '@react-navigation/stack';
 import { registerRootComponent } from 'expo';
+import Valetsignin from './Pages/OrderScreen/Valetsignin'
 
-
+export const AuthContext = createContext(null);
 
 
 
@@ -50,31 +51,31 @@ const Tab = createBottomTabNavigator();
 
 const Drawer = createDrawerNavigator();
 
-// interface HeaderProps {
-//   navigation: any;
-//   title: string;
-//   onPress: () => void;
-// }
+interface HeaderProps {
+  navigation: any;
+  title: string;
+  onPress: () => void;
+}
 
-// const Header: React.FC<HeaderProps> = ({ navigation, title, onPress }) => {
-//   return (
+const Header: React.FC<HeaderProps> = ({ navigation, title, onPress }) => {
+  return (
     
-//     <SafeAreaView style={styles.safeArea}>
-//       <View style={styles.header}>
-//         {/* {navigation.canGoBack() && (
-//           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-//             <Feather name="arrow-left" size={44} color="white" />
-//           </TouchableOpacity>
-//         )} */}
-//         <Text style={styles.title}>{title}</Text>
-//         <TouchableOpacity style={styles.menuButton}>
-//         {/* onPress={() => navigation.toggleDrawer()} */}
-//           {/* <Feather name="menu" size={44} color="white" /> */}
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
+    <SafeAreaView style={styles.safeArea}>
+      <View >
+        {/* {navigation.canGoBack() && (
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Feather name="arrow-left" size={44} color="white" />
+          </TouchableOpacity>
+        )} */}
+        <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity style={styles.menuButton}>
+        {/* onPress={() => navigation.toggleDrawer()} */}
+          {/* <Feather name="menu" size={44} color="white" /> */}
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
 
 const App: React.FC = () => {
   
@@ -84,6 +85,8 @@ const App: React.FC = () => {
   const [tableToken, setTableToken] = useState<string | null>(null);
   const [valetToken, setValetToken] = useState<string | null>(null);
   const [currentRouteName, setCurrentRouteName] = useState<string | undefined>(undefined);
+  const [isUserActive, setIsUserActive] = useState<boolean>(true);
+  const lastInteractionTimeRef = useRef<number>(Date.now());
   registerRootComponent(App);
 
   useEffect(() => {
@@ -122,7 +125,7 @@ const App: React.FC = () => {
     const tableToken = await AsyncStorage.getItem('tableToken');
     const valetToken = await AsyncStorage.getItem('valetToken');
 
-setTableToken(tableToken);
+    setTableToken(tableToken);
     setCustomerToken(customerToken);
     setValetToken(valetToken);
     console.log('Customer token:', customerToken);
@@ -136,7 +139,7 @@ setTableToken(tableToken);
     checkCustomerToken();
     const interval = setInterval(() => {
       checkCustomerToken();
-    }, 3000);
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -185,6 +188,12 @@ setTableToken(tableToken);
       email: string; 
       resetToken: string 
     };
+  };
+
+   // This function will be called whenever the user interacts with the screen
+   const onUserInteraction = () => {
+    console.log('User interaction detected');
+    lastInteractionTimeRef.current = Date.now();
   };
   
   const Stack = createStackNavigator<RootStackParamList>();
@@ -238,18 +247,24 @@ setTableToken(tableToken);
 
 
   return (
+    <AuthContext.Provider value={{ checkCustomerToken }}>
     <LinearGradient
     colors={['#3F63CB', '#003266', '#000000']}
     locations={[0, 0.4895, 0.9789]}
     style={styles.container}
   >
-    <View style={styles.container}>
+    <View style={styles.container1}>
       
       {/* <AppNavigator /> */}
-      <StatusBar hidden={true} />
-      <NavigationContainer ref={navigationRef}  >
-        <TouchableWithoutFeedback onPress={onPressScreen}>
-          <View style={styles.content}>
+      <StatusBar hidden={true} /> 
+      <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        >  
+     <NavigationContainer ref={navigationRef}  >
+     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+     <View style={styles.content}>
             <Drawer.Navigator backBehavior="history"
               initialRouteName="Home"
               drawerContent={(props) => <CustomDrawerContent {...props}  />}
@@ -257,152 +272,207 @@ setTableToken(tableToken);
                 headerShown: false,  // Add this line to hide headers
                   overlayColor: 'transparent', // Make the overlay color transparent if desired
                   drawerType: tableToken ? 'none' : 'none',  // Only show drawer if tableToken exists
+                  swipeEnabled: false, // Add this line to disable swipe gestures
+                  gestureEnabled: false, // Add this to disable all gestures    
                  // drawerStyle: tableToken ? { // Adjust styles based on tableToken
                 //  drawerType: 'slide', // This will slide the drawer and push the content above
                   //drawerStyle: {
                     drawerStyle: tableToken ? { // Adjust styles based on tableToken
-                  height: 70, // Adjust the height to take up half the screen, or set to your preference
-                  position: 'absolute', // Position it absolutely to control placement
-                  left: 320,
-                  top: '93%',
-                  bottom: 0, // Align it to the bottom
-                  borderTopLeftRadius: 20, // Optional: round the top corners
-                  borderTopRightRadius: 20, // Optional: round the top corners
-                  backgroundColor: 'black', // Drawer background color
+                //   // height: 370, // Adjust the height to take up half the screen, or set to your preference
+                //   // position: 'absolute', // Position it absolutely to control placement
+                //   // left: 320,
+                //   top: '-10%',
+                //   // bottom: 0, // Align it to the bottom
+                //   // borderTopLeftRadius: 20, // Optional: round the top corners
+                //   // borderTopRightRadius: 20, // Optional: round the top corners
+                //   // backgroundColor: 'white', // Drawer background color
                   
                 }: { display: 'none' },  // Hide drawer when no tableToken
               }}
               //drawerLockMode={tableToken ? 'unlocked' : 'locked-closed'}  // Lock the drawer when no tableToken
 
             >
-                      <Drawer.Screen name="SignIn" component={SignIn} />
-                      <Drawer.Screen name="SignInUpCustomer" component={SignInUpCustomer} />
-                      <Drawer.Screen name="ResetPass" component={ResetPass} />
-                      <Drawer.Screen name="Valetstartingpage" component={Valetstartingpage} />
-                      <Drawer.Screen name="Change_password" component={Change_password} />
-                      <Drawer.Screen name="bonus" component={bonus} />
-                      <Drawer.Screen name="Profile" component={Profile} />  
-                      <Drawer.Screen name="UpdateAccount" component={UpdateAccount} />
-                      <Drawer.Screen name="ChangePassword" component={ChangePassword} />
-                      <Drawer.Screen name="DiningExperience" component={DiningExperience} />
-                      <Drawer.Screen name="HomeScreen" component={HomeScreen} />
+                      <Drawer.Screen name="SignIn" component={SignIn} 
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }}/>
+                      <Drawer.Screen name="SignInUpCustomer" component={SignInUpCustomer}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      <Drawer.Screen name="ResetPass" component={ResetPass} 
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }}/>
+                      <Drawer.Screen name="Valetstartingpage" component={Valetstartingpage}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      <Drawer.Screen name="Change_password" component={Change_password}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      {/* <Drawer.Screen name="Bonus" component={Bonus} /> */}
+                      <Drawer.Screen name="Profile" component={Profile}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />  
+                      <Drawer.Screen name="UpdateAccount" component={UpdateAccount}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      <Drawer.Screen name="ChangePassword" component={ChangePassword}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      <Drawer.Screen name="DiningExperience" component={DiningExperience} 
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }}/>
+                      <Drawer.Screen name="HomeScreen" component={HomeScreen}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }} />
+                      <Drawer.Screen name="Valetsignin" component={Valetsignin}
+                      options={{
+                        header: ({ navigation }) => (
+                          <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                        ),
+                      }}/>
 
               {tableToken?
               <Drawer.Screen
                 name="Home"
                 component={valetToken ? ValetAccountScreen : HomeScreen}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                  ),
+                }}
               />:
               <Drawer.Screen
                 name="Home"
                 component={valetToken ? ValetAccountScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="HOME" onPress={onPressScreen} />
+                  ),
+                }}
               />
 }
 
               <Drawer.Screen
                 name="TableLogout"
                 component={tableToken ? TableLogout : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="TABLE LOGOUT" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="TABLE LOGOUT" onPress={onPressScreen} />
+                  ),
+                }}
               />
               {/* CarTimer */}
               <Drawer.Screen
                 name="SurveyScreen"
                 component={tableToken ? SurveyScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="SURVEY SCREEN" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="SURVEY SCREEN" onPress={onPressScreen} />
+                  ),
+                }}
               />
               <Drawer.Screen
                 name="CarTimer"
                 component={tableToken ? CarTimer : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="WAIT FOR VALET" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="WAIT FOR VALET" onPress={onPressScreen} />
+                  ),
+                }}
               />
 <Drawer.Screen
                 name="MenuScreen"
                 component={tableToken ? MenuScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="MENU SCREEN" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="MENU SCREEN" onPress={onPressScreen} />
+                  ),
+                }}
               />
               {customerToken ? 
 <Drawer.Screen
                 name="ValetScreen"
                 component={tableToken ? ValetScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
+                  ),
+                }}
                 // fhoeruihfiuerhf8w38742y4rfhej
               /> : <Drawer.Screen
               name="ValetScreen"
               component={tableToken ? SignInUpCustomer : TableSignIN}
-              // options={{
-              //   header: ({ navigation }) => (
-              //     <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
-              //   ),
-              // }}
+              options={{
+                header: ({ navigation }) => (
+                  <Header navigation={navigation} title="VALET SCREEN" onPress={onPressScreen} />
+                ),
+              }}
             />  }
               {/* ForgotPass */}
               <Drawer.Screen
                 name="ForgotPass"
                 component={ForgotPass}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="FORGOT PASS" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="FORGOT PASS" onPress={onPressScreen} />
+                  ),
+                }}
               />
               <Drawer.Screen
                 name="ContactUsScreen"
                 component={tableToken ? ContactUsScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="CONTACT US" onPress={onPressScreen} />
-                //   ),
-                // }}
+
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="CONTACT US" onPress={onPressScreen} />
+                  ),
+                }}
               />
               {/* RedeemPage */}
               {customerToken ?
               <>
-              {/* <Drawer.Screen
+              <Drawer.Screen
                 name="BonusScreen"
                 component={tableToken ? BonusScreen : TableSignIN}
-                options={{
-                  header: ({ navigation }) => (
-                    <Header navigation={navigation} title="BONUS SCREEN" onPress={onPressScreen} />
-                  ),
-                }}
-              />  */}
+                
+              /> 
               <Drawer.Screen
                 name="RedeemPage"
                 component={tableToken ? RedeemPage : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="REDEEM PAGE" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="REDEEM PAGE" onPress={onPressScreen} />
+                  ),
+                }}
               /> 
               </>
               :
@@ -412,20 +482,20 @@ setTableToken(tableToken);
               <Drawer.Screen
                 name="BonusScreen"
                 component={Login}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
+                  ),
+                }}
               /> 
               <Drawer.Screen
                 name="RedeemPage"
                 component={SignInUpCustomer}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="SIGN IN/UP CUSTOMER" onPress={onPressScreen} />
+                  ),
+                }}
               /> 
 
 </>
@@ -433,11 +503,11 @@ setTableToken(tableToken);
               <Drawer.Screen
                 name="OrderScreen"
                 component={tableToken ? OrderScreen : TableSignIN}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="ORDER SCREEN" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="ORDER SCREEN" onPress={onPressScreen} />
+                  ),
+                }}
               />
 
 
@@ -448,20 +518,20 @@ setTableToken(tableToken);
               <Drawer.Screen
                 name="valetlogin"
                 component={ValetAccountScreen}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
+                  ),
+                }}
               />:
 <Drawer.Screen
                 name="valetlogin"
                 component={ValetLogin}
-                // options={{
-                //   header: ({ navigation }) => (
-                //     <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
-                //   ),
-                // }}
+                options={{
+                  header: ({ navigation }) => (
+                    <Header navigation={navigation} title="VALET" onPress={onPressScreen} />
+                  ),
+                }}
               />
              }
 
@@ -475,11 +545,13 @@ setTableToken(tableToken);
         </TouchableWithoutFeedback>
       </NavigationContainer>
 
-
+      </KeyboardAvoidingView>
       <TimerCar showTimer={true} />  
 
     </View>
     </LinearGradient>
+    </AuthContext.Provider>
+
   );
 };
 
@@ -488,13 +560,17 @@ setTableToken(tableToken);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: 1000
+  },
+  container1:{
+    flex: 1,
   },
   content: {
     flex: 1,
 
   },
   safeArea: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#rfff',
     // backgroundColor: '#141414',
   },
   // header: {
@@ -525,4 +601,3 @@ const styles = StyleSheet.create({
 
 
 export default App;
-        // "projectId": "a58edf9d-4f7f-424f-976e-ebe3c74b2b78"

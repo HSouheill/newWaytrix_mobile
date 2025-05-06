@@ -2,17 +2,17 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, ImageBackground, Image, Platform } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ipAddress from '../../../config';
+import ipAddress from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import ForgotPass from './ForgotPass';  
-import SignInUpCustomer from './SignUpCustomer';
-import ValetScreen from '../Valet/ValetScreen';
-import BonusScreen from '../../Bonus/BonusScreen';
+import ForgotPass from '../Accounts/Customer/ForgotPass';  
+import SignInUpCustomer from '../Accounts/Customer/SignUpCustomer';
+import ValetScreen from './/ValetScreen';
+import BonusScreen from '../Bonus/BonusScreen';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import HomeScreen from '../../HomeScreen';
-import { AuthContext } from '../../../App'; // Adjust the path as needed
+import HomeScreen from '../HomeScreen';
+import { AuthContext } from '../../App'; // Adjust the path as needed
 import CountryPicker from 'react-native-country-picker-modal'; // Import CountryPicker
 
 
@@ -40,8 +40,6 @@ const clearAuthData = async () => {
       'customerToken',
       'customerId',
       'username',
-      'phone',
-      'password',
       'valetToken',
       'lastLoginTimestamp'
     ];
@@ -77,10 +75,6 @@ const SignIn = () => {
   const [callingCode, setCallingCode] = useState('961'); 
   const [isCountryPickerVisible, setIsCountryPickerVisible] = useState(false);
     
-  const clearFormFields = () => {
-    setUsernameOrPhone('');
-    setPassword('');
-  };
   useEffect(() => {
     // Clear cached credentials when component mounts
     clearAuthData();
@@ -282,6 +276,10 @@ const SignIn = () => {
     'YE': 10, // Yemen
 };
 
+const clearFormFields = () => {
+  setUsernameOrPhone('');
+  setPassword('');
+};
 
   const getCurrentLimit = () => {
     return phoneNumberLimits[countryCode] || 10; // Default to 10 if country not found
@@ -360,13 +358,12 @@ const SignIn = () => {
       // Run checkCustomerToken to update app state before navigation
       await checkCustomerToken();
 
-      navigation.navigate('BonusScreen', { username: username });
-      clearFormFields(); // Clear all form fields
-
+      navigation.navigate('ValetScreen', { username: username });
       console.log('Customer Token:', token);
       console.log('Customer ID:', _id)
       console.log('Navigating to bonus screen');
-      
+      clearFormFields(); // Clear all form fields
+
       // Start the logout timer (5 minutes)
       setTimeout(async () => {
         await logoutUser();
@@ -409,10 +406,10 @@ const SignIn = () => {
   };
 
   return (
-    <ImageBackground source={require('../../../assets/StartingScreen.png')} style={styles.backgroundContainer}>
+    <ImageBackground source={require('../../assets/StartingScreen.png')} style={styles.backgroundContainer}>
       <View style={styles.container} >
         <StatusBar backgroundColor="transparent" barStyle="light-content" translucent={true} />
-        <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image}/>
+        <Image source={require('../../assets/newlogo_waytrix.png')} style={styles.image}/>
         <Text style={styles.title}>Log In</Text>
         
         <View style={styles.formcontainer}>

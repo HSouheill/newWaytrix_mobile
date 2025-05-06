@@ -224,7 +224,7 @@ const Customer = ({ navigation }) => {
   const [verificationKey, setVerificationKey] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [dob, setDob] = useState(''); 
+  const [dob, setdob] = useState(''); 
   const [showDatePicker, setShowDatePicker] = useState(false); 
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
@@ -234,10 +234,8 @@ const Customer = ({ navigation }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [combinedPhone, setCombinedPhone] = useState('');
   const [usernameExists, setUsernameExists] = useState(false); // New state to track if username exists
-  const [passwordError, setPasswordError] = useState('');
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
-  const [emailError, setEmailError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+
   const [emailExists, setEmailExists] = useState(false);
   const [phoneExists, setPhoneExists] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -245,8 +243,115 @@ const Customer = ({ navigation }) => {
   const route = useRoute();
   const params = route.params as RouteParams;
   const source = params?.source || 'bonus';
+  
+  // Error states
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [genderError, setGenderError] = useState('');
+  const [dobError, setdobError] = useState('');
 
 
+    // Check username on change after a delay
+    useEffect(() => {
+      const timeoutId = setTimeout(() => {
+        if (username.trim()) {
+          checkUsername(username);
+        } else {
+          setUsernameError('');
+        }
+      }, 5000);
+  
+      return () => clearTimeout(timeoutId);
+    }, [username]);
+
+     // Check email on change after a delay
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (email.trim() && /^\S+@\S+\.\S+$/.test(email)) {
+        checkEmail(email);
+      } else if (email.trim() && !/^\S+@\S+\.\S+$/.test(email)) {
+        setEmailError('Please enter a valid email address');
+      } else {
+        setEmailError('');
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeoutId);
+  }, [email]);
+
+  // Check phone on change after a delay
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     if (phone.trim() && phone.length >= 8) {
+  //       checkPhone(phone);
+  //     } else if (phone.trim()) {
+  //       setPhoneError('Phone number should be at least 8 digits');
+  //     } else {
+  //       setPhoneError('');
+  //     }
+  //   }, 500);
+
+  //   return () => clearTimeout(timeoutId);
+  // }, [phone, callingCode]);
+
+
+  // Function to check if email already exists
+  const checkEmail = async (email) => {
+    try {
+      if (!email.trim()) {
+        setEmailError('');
+        return;
+      }
+
+      const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
+        email 
+      });
+
+      // Email is available
+      setEmailError('');
+    } catch (error) {
+      // If server returns email already taken error
+      if (error.response && error.response.status === 400 && 
+          (error.response.data === 'email already taken' || error.response.data === 'User already exists')) {
+        setEmailError('Email already taken');
+      } else {
+        setEmailError('');
+      }
+    }
+  };
+
+  // Function to check if phone already exists
+  const checkPhone = async (phone) => {
+    try {
+      if (!phone.trim()) {
+        setPhoneError('');
+        return;
+      }
+
+      const combinedPhone = `+${callingCode}${phone}`;
+      const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
+        phone: combinedPhone 
+      });
+
+      // Phone is available
+      setPhoneError('');
+    } catch (error) {
+      // If server returns phone already taken error
+      if (error.response && error.response.status === 400 && 
+          error.response.data === 'Phone number already exists') {
+        setPhoneError('Phone number already exists');
+      } else {
+        setPhoneError('');
+      }
+    }
+  };
+
+
+  
   const phoneNumberLimits = {
     'LB': 8,  // Lebanon
     'US': 10, // United States
@@ -505,19 +610,6 @@ const Customer = ({ navigation }) => {
     
         return () => clearTimeout(timeoutId);
       }, [email]);
-
-      // useEffect(() => {
-      //   const timeoutId = setTimeout(() => {
-      //     if (email.trim() && /^\S+@\S+\.\S+$/.test(email)) {
-      //       checkEmail(email);
-      //     } else {
-      //       setEmailExists(false);
-      //       setEmailError('');
-      //     }
-      //   }, 500);
-    
-      //   return () => clearTimeout(timeoutId);
-      // }, [email]);
     
 
       useEffect(() => {
@@ -533,24 +625,10 @@ const Customer = ({ navigation }) => {
       }, [phone, callingCode]);
 
 
-      // Add useEffect for phone validation
-      // useEffect(() => {
-      //   const timeoutId = setTimeout(() => {
-      //     if (phone.trim() && phone.length >= 8) {
-      //       checkPhone(phone);
-      //     } else {
-      //       setPhoneExists(false);
-      //       setPhoneError('');
-      //     }
-      //   }, 500);
-    
-      //   return () => clearTimeout(timeoutId);
-      // }, [phone, callingCode]);
-
 
       const handleDateSelect = (date) => {
-        // Format the date as DD/MM/YYYY
-        const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        // Format as MM/DD/YYYY for backend
+        const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
         setSelectedDate(formattedDate);
         setShowCalendar(false);
       };
@@ -569,25 +647,19 @@ const Customer = ({ navigation }) => {
         });
   
         // The username is available (no error from server)
-        setUsernameExists(false);
+        // setUsernameExists(false);
+        setUsernameError('');
       } catch (error) {
         // If server returns 400, username exists
         if (error.response && error.response.status === 400 && 
             error.response.data === 'Username already taken') {
-          setUsernameExists(true);
-        } else {
+              setUsernameError('Username already taken');
+            } else {
           // For other errors, assume username is available
-          setUsernameExists(false);
+          setUsernameError('');
         }
       }
     };
-
-
-  // const handleDateSelect = (date) => {
-  //   setSelectedDate(date.toLocaleDateString());
-  //   setShowCalendar(false);
-  // };
-  
 
 
 
@@ -595,118 +667,6 @@ const Customer = ({ navigation }) => {
     setIsSignIn(!isSignIn);
   };
 
-
-  // Add function to check if email exists
-
-  const checkEmail = async (email) => {
-    try {
-      // Only check if username is not empty
-      if (!email.trim()) {
-        setEmailExists(false);
-        return;
-      }
-
-      const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
-        email 
-      });
-
-      // The username is available (no error from server)
-      setEmailExists(false);
-    } catch (error) {
-      // If server returns 400, username exists
-      if (error.response && error.response.status === 400 && 
-          error.response.data === 'email already taken') {
-        setEmailExists(true);
-      } else {
-        // For other errors, assume username is available
-        setEmailExists(false);
-      }
-    }
-  };
-  const checkPhone = async (phone) => {
-    try {
-      // Only check if username is not empty
-      if (!phone.trim()) {
-        setPhoneExists(false);
-        return;
-      }
-
-      const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
-        phone 
-      });
-
-      // The username is available (no error from server)
-      setPhoneExists(false);
-    } catch (error) {
-      // If server returns 400, username exists
-      if (error.response && error.response.status === 400 && 
-          error.response.data === 'Phone number already taken') {
-        setPhoneExists(true);
-      } else {
-        // For other errors, assume username is available
-        setPhoneExists(false);
-      }
-    }
-  };
-
-  // const checkEmail = async (email) => {
-  //   try {
-  //     // Only check if email is not empty and valid format
-  //     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
-  //       setEmailExists(false);
-  //       setEmailError('');
-  //       return;
-  //     }
-
-  //     const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
-  //       email 
-  //     });
-
-  //     // The email is available (no error from server)
-  //     setEmailExists(false);
-  //     setEmailError('');
-  //   } catch (error) {
-  //     // If server returns 400, email exists
-  //     if (error.response && error.response.status === 400) {
-  //       setEmailExists(true);
-  //       setEmailError('Email is already registered');
-  //     } else {
-  //       // For other errors, assume email is available
-  //       setEmailExists(false);
-  //       setEmailError('');
-  //     }
-  //   }
-  // };
-
-  // Modified checkPhone function
-  // const checkPhone = async (phone) => {
-  //   try {
-  //     // Only check if phone is not empty and meets minimum length
-  //     if (!phone.trim() || phone.length < 8) {
-  //       setPhoneExists(false);
-  //       setPhoneError('');
-  //       return;
-  //     }
-
-  //     const response = await axios.post(`${ipAddress}/api/auth/signup`, { 
-  //       phone: `+${callingCode}${phone}`
-  //     });
-
-  //     // The phone is available (no error from server)
-  //     setPhoneExists(false);
-  //     setPhoneError('');
-  //   } catch (error) {
-  //     // If server returns 400, phone exists
-  //     if (error.response && error.response.status === 400) {
-  //       setPhoneExists(true);
-  //       setPhoneError('Phone number is already registered');
-  //     } else {
-  //       // For other errors, assume phone is available
-  //       setPhoneExists(false);
-  //       setPhoneError('');
-  //     }
-  //   }
-  // };
 
   
 
@@ -757,50 +717,97 @@ const Customer = ({ navigation }) => {
     setPhoneError('');
   };
 
-  const handleSubmit = () => {
-        // Validate phone number length before submitting
-        const expectedLength = getCurrentLimit();
-        if (phone.length !== expectedLength) {
-          Alert.alert(
-            'Invalid Phone Number',
-            `Please enter ${expectedLength} digits for ${countryCode} phone numbers.`
-          );
-          return;
-        }
-    if (!name.trim() || !lastName.trim()) {
-      alert('Please enter your full name');
-      return;
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate name
+    if (!name.trim()) {
+      setNameError('First name is required');
+      isValid = false;
+    } else {
+      setNameError('');
     }
 
-    if (emailExists) {
-      alert('Please use a different email address');
-      return;
+    // Validate last name
+    if (!lastName.trim()) {
+      setLastNameError('Last name is required');
+      isValid = false;
+    } else {
+      setLastNameError('');
     }
 
-    if (phoneExists) {
-      alert('Please use a different phone number');
-      return;
+    // Validate username
+    if (!username.trim()) {
+      setUsernameError('Username is required');
+      isValid = false;
     }
 
-    if (!validatePasswords(password, confirmpassword)) {
-      return;
+    // Email validation
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      isValid = false;
     }
+
+    // Phone validation
+    if (!phone.trim()) {
+      setPhoneError('Phone number is required');
+      isValid = false;
+    } else {
+      const expectedLength = phoneNumberLimits[countryCode] || 8;
+      if (phone.length !== expectedLength) {
+        setPhoneError(`Phone number should be ${expectedLength} digits`);
+        isValid = false;
+      }
+    }
+
+    // Password validation
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
+      isValid = false;
+    } else if (password !== confirmpassword) {
+      setPasswordError('Passwords do not match');
+      isValid = false;
+    }
+
+    // Gender validation
     if (!gender) {
-      alert('Please select a gender');
-      return;
-    }
-    if (usernameExists) {
-      alert('Username already exists. Please choose a different one.');
-      return; // Stop the submission process
+      setGenderError('Please select a gender');
+      isValid = false;
+    } else {
+      setGenderError('');
     }
 
-    // Combine the country code and phone number before sending
+    // Date of birth validation
+    if (!selectedDate) {
+      setdobError('Date of birth is required');
+      isValid = false;
+    } else {
+      setdobError('');
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = () => {
+    // First validate all form fields
+    if (!validateForm()) {
+      return; // Stop if validation fails
+    }
+
+    // Check for existing username, email, or phone
+    if (usernameError || emailError || phoneError) {
+      return; // Stop if any field has an error
+    }
+
+    // Combine the country code and phone number
     const combinedPhone = `+${callingCode}${phone}`;
 
-    if (!selectedDate) {
-      alert('Please select a date of birth');
-      return;
-    }
     const userData = {
       name,
       lastName,
@@ -813,8 +820,6 @@ const Customer = ({ navigation }) => {
       role: 'customer',
     };
 
-
-
     axios.post(`${ipAddress}/api/Auth/signup`, userData)
       .then(response => {
         console.log(response.data);
@@ -822,16 +827,29 @@ const Customer = ({ navigation }) => {
         AsyncStorage.setItem('verificationModalVisible', JSON.stringify(true));
         clearFormFields(); // Clear all form fields
         navigation.navigate('SignIn');
-        // setShowOtpModal(true);
+        setShowOtpModal(false);
       })
       .catch(error => {
-        if (error.response?.data?.message === 'Invalid date format') {
-          alert('Please enter a valid date of birth');
-        } else {
-          console.error(error);
-          alert('Signup failed: ' + error.response?.data || 'Unknown error');
+        console.error(error);
+        
+        // Handle specific error messages from the server
+        if (error.response?.data) {
+          const errorMessage = error.response.data;
+          
+          if (typeof errorMessage === 'string') {
+            if (errorMessage.includes('Username already taken')) {
+              setUsernameError('Username already taken');
+            } else if (errorMessage.includes('User already exists') || errorMessage.includes('email already taken')) {
+              setEmailError('Email already taken');
+            } else if (errorMessage.includes('Phone number already exists')) {
+              setPhoneError('Phone number already exists');
+            } else if (errorMessage.includes('Invalid date format')) {
+              setdobError('Please enter a valid date of birth');
+            }
+          }
         }
         setShowOtpModal(false);
+
       });
   };
 
@@ -884,7 +902,7 @@ const Customer = ({ navigation }) => {
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || dob;
     setShowDatePicker(false);
-    setDob(currentDate.toLocaleDateString()); // Format the selected date
+    setdob(currentDate.toLocaleDateString()); // Format the selected date
   };
 
   const handleResendOTP = () => {
@@ -1054,31 +1072,39 @@ const Customer = ({ navigation }) => {
   return (
     <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
       <View style={styles.container}>
-        <Image source={require('../../../assets/logo1.png')} style={styles.image} />
+        <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image} />
         <Text style={styles.title}>Sign Up</Text>
 
         <View style={styles.nameContainer}>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>First Name</Text>
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-              placeholder="First Name"
-              placeholderTextColor="#9EA0A4"
-            />
-          </View>
+        <View style={styles.inputWrapper}>
+              <Text style={styles.label}>First Name</Text>
+              <TextInput
+                value={name}
+                onChangeText={(text) => {
+                  setName(text);
+                  if (text.trim()) setNameError('');
+                }}
+                style={[styles.input, nameError ? styles.inputError : null]}
+                placeholder="First Name"
+                placeholderTextColor="#9EA0A4"
+              />
+              {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+            </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Last Name</Text>
-            <TextInput
-              value={lastName}
-              onChangeText={setLastName}
-              style={styles.input}
-              placeholder="Last Name"
-              placeholderTextColor="#9EA0A4"
-            />
-          </View>
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Last Name</Text>
+              <TextInput
+                value={lastName}
+                onChangeText={(text) => {
+                  setLastName(text);
+                  if (text.trim()) setLastNameError('');
+                }}
+                style={[styles.input, lastNameError ? styles.inputError : null]}
+                placeholder="Last Name"
+                placeholderTextColor="#9EA0A4"
+              />
+              {lastNameError ? <Text style={styles.errorText}>{lastNameError}</Text> : null}
+            </View>
         </View>
 
         <View style={styles.nameContainer}>
@@ -1093,11 +1119,9 @@ const Customer = ({ navigation }) => {
             />
           </View> */}
         <View style={styles.inputWrapper}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Username</Text>
-            {usernameExists && (
-              <Text style={styles.userExistsText}>Invalid username</Text>
-            )}
+        <View style={styles.labelContainer}>
+              <Text style={styles.label}>Username</Text>
+              {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
             </View>
           <TextInput
             value={username}
@@ -1115,8 +1139,11 @@ const Customer = ({ navigation }) => {
         </View>
 
           <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Phone Number</Text>
-            <View style={[styles.phoneInputWrapper, phoneExists && styles.inputError]}>
+          <View style={styles.labelContainer}>
+              <Text style={styles.label}>Phone Number</Text>
+              {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+            </View>              
+              <View style={[styles.phoneInputWrapper, phoneError ? styles.inputError : null]}>
               <TouchableOpacity 
                 onPress={() => setIsCountryPickerVisible(true)} 
                 style={styles.countrySelector}
@@ -1133,7 +1160,7 @@ const Customer = ({ navigation }) => {
               <TextInput
                 value={phone}
                 onChangeText={setPhone}
-                style={styles.phoneNumberInput}
+                style={styles.input}
                 placeholder={`Phone Number ${getCurrentLimit()} digits`}
                 placeholderTextColor="#9EA0A4"
                 keyboardType="phone-pad"
@@ -1164,13 +1191,16 @@ const Customer = ({ navigation }) => {
 
           <View style={styles.nameContainer}>
             <View style={styles.inputWrapper}>
+            <View style={styles.labelContainer}>
               <Text style={styles.label}>Date of Birth</Text>
-              <TouchableOpacity 
+              {dobError ? <Text style={styles.errorText}>{dobError}</Text> : null}
+            </View>
+                          <TouchableOpacity 
                 style={styles.input}
                 onPress={() => setShowCalendar(!showCalendar)}
               >
                 <Text style={[styles.dobplaceholderText, selectedDate && styles.selectedText]}>
-                  {selectedDate || 'DOB'}
+                  {selectedDate || 'dob'}
                 </Text>
                 <Icon 
                   name={showCalendar ? 'chevron-up' : 'chevron-down'} 
@@ -1186,7 +1216,10 @@ const Customer = ({ navigation }) => {
               />
             </View>
             <View style={styles.inputWrapper}>
+            <View style={styles.labelContainer}>
               <Text style={styles.label}>Gender</Text>
+              {genderError ? <Text style={styles.errorText}>{genderError}</Text> : null}
+            </View>
               <CustomDropdown
                 options={genderOptions}
                 value={gender}
@@ -1198,18 +1231,21 @@ const Customer = ({ navigation }) => {
           </View>
 
 
-          <Text style={styles.label}>Email Address</Text>
-          <View>
+          <View style={styles.labelContainer}>
+              <Text style={styles.label}>Email Address</Text>
+              {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            </View>
+                      <View>
             <TextInput
               value={email}
               onChangeText={setEmail}
-              style={[styles.input, emailExists && styles.inputError]}
+              style={[styles.input, emailError ? styles.inputError : null]}
               placeholder="Email Address"
               placeholderTextColor="#9EA0A4"
+              keyboardType="email-address"
+
             />
-            {emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
+
           </View>
 
            {/* <View style={styles.passwordContainer}>
@@ -1226,8 +1262,12 @@ const Customer = ({ navigation }) => {
                         <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#000000" />
                   </TouchableOpacity> */}
           
-           <Text style={styles.label}>Password</Text>
-           <View style={styles.passwordContainer}>
+          <View style={styles.labelContainer}>
+              <Text style={styles.label}>Password</Text>
+              {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+            </View>
+            
+               <View style={styles.passwordContainer}>
             <TextInput
               value={password}
               onChangeText={(text) => {
@@ -1235,7 +1275,7 @@ const Customer = ({ navigation }) => {
                 validatePasswords(text, confirmpassword);
 
               }}
-              style={[styles.input, !isPasswordMatch && styles.inputError]}
+              style={[styles.input, !isPasswordMatch || passwordError  && styles.inputError]}
               placeholder="Password"
               placeholderTextColor="#9EA0A4"
               secureTextEntry={!showPassword}
@@ -1260,7 +1300,7 @@ const Customer = ({ navigation }) => {
                   setconfirmpassword(text);
                   validatePasswords(password, text);
                 }}
-                style={[styles.input, !isPasswordMatch && styles.inputError]}
+                style={[styles.input, !isPasswordMatch && styles.inputError, passwordError ? styles.inputError : null]}
                 placeholder="Confirm Password"
                 placeholderTextColor="#9EA0A4"
                 secureTextEntry={!showConfirmPassword}
@@ -1328,10 +1368,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   image: {
-    width: 90,
+    width: 300,
     height: 90,
-    marginBottom: 20,
     alignSelf: 'center',
+    resizeMode: 'contain',
+
   },
   title: {
     fontSize: 30,
@@ -1709,10 +1750,10 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
+    fontSize: 12,
     marginLeft: 10,
-    top: -5,
-    marginBottom: 5,
+    // top: -5,
+    // marginBottom: 5,
   },
   labelContainer: {
     flexDirection: 'row',
@@ -1728,7 +1769,7 @@ const styles = StyleSheet.create({
   },
   passwordErrorText: {
     color: '#FF0000',
-    fontSize: 14,
+    fontSize: 10,
     // marginTop: 5
     top: -5,
     marginLeft: 10,
@@ -1903,6 +1944,7 @@ const styles = StyleSheet.create({
   invisibleButton: {
     display: 'none',
   },
+  
 
   
 });

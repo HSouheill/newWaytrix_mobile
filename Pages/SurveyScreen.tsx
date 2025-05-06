@@ -216,7 +216,7 @@ const [playingWayTrixService, setPlayingWayTrixService] = useState(null);
           style={styles.gradientContainer}
         >
           {/* <View style={styles.headerContainer}> */}
-            <Image source={require('../assets/logo1.png')} style={styles.logo} />
+            <Image source={require('../assets/newlogo_waytrix.png')} style={styles.logo} />
           {/* </View> */}
 
 
@@ -545,16 +545,18 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    paddingBottom: 80
-    // top: 20,
+    paddingBottom: 80,
+    // top: '5%',
     // backgroundColor: '#757575', // Background color changed to black
   },
   logo: {
-    width: 90,
+    width: 300,
     height: 90,
     alignSelf: 'center',
-    top: 30,
-    marginBottom: 30
+    resizeMode: 'contain',
+    // top: '3%',
+    marginTop : '5%',
+    // marginBottom: '10%'
   },
   title: {
       fontSize: 24,

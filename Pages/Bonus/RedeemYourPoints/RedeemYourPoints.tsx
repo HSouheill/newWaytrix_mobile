@@ -7,7 +7,7 @@ import ipAddress from '../../../config';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomHeader from '../../../layout/CustomHeader';
 import BonusScreen from '../BonusScreen';
-import { useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 
 const RedeemYourPoints = () => {
@@ -86,7 +86,9 @@ const RedeemYourPoints = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-
+  const navigateToBonus = () => {
+    navigation.navigate('BonusScreen');
+  };
 
   return (
      <TouchableWithoutFeedback>
@@ -97,7 +99,7 @@ const RedeemYourPoints = () => {
     >
 
       <View style={styles.top}>
-      < CustomHeader username={customerName} />
+      <CustomHeader username={customerName} />
       <View style={styles.content}>
         
 
@@ -114,7 +116,7 @@ const RedeemYourPoints = () => {
               <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Vouchers />
-        <TouchableOpacity onPress={navigation.navigate(BonusScreen)}  style={styles.submitButton}>
+        {/* <TouchableOpacity onPress={navigateToBonus} style={styles.submitButton}>
                  <LinearGradient
                                  colors={['#3F63CB', '#679BFF']}
                                  style={styles.backbutton}
@@ -123,7 +125,7 @@ const RedeemYourPoints = () => {
                                >
                    <Text style={styles.submitButtonText}>Back</Text>
                 </LinearGradient>
-                 </TouchableOpacity>
+                 </TouchableOpacity> */}
       </ScrollView>
       </View>
       </View>
@@ -145,19 +147,19 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    top: "7%",
+    top: "12%",
     // paddingHorizontal: 16,
   },
   top:{
     flex: 1,
-    top: "2%",
+    padding: 10,
   },
   gradient: {
     flex: 1,
   },
   container: {
     flex: 1,
-    padding: 10,
+    // padding: 10,
     marginBottom: 100,
   },
   header: {
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 18,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: 28,

@@ -10,6 +10,7 @@ const BonusWheelHeader = ({ username }) => {
   const navigation = useNavigation();
   const [totalPoints, setTotalPoints] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [verified, setVerified] = useState(false);
   
   const fetchPoints = async () => {
     try {
@@ -33,28 +34,36 @@ const BonusWheelHeader = ({ username }) => {
     } catch (error) {
       console.error('Error fetching points:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchPoints();
     const intervalId = setInterval(fetchPoints, 3000);
+    
+    // Fetch verification status
+    const fetchUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('userData');
+        if (userData) {
+          const parsed = JSON.parse(userData);
+          setVerified(parsed.isVerified);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    
+    fetchUserData();
+    
     return () => clearInterval(intervalId);
   }, []);
 
   return (
     <View style={styles.headerContainer}>
       <View style={styles.leftSection}>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <View style={styles.userContainer}>
-            <Image source={images.profileLogo} style={styles.userIcon} />
-            <Text style={styles.username}>
-              {username ? username.charAt(0).toUpperCase() + username.slice(1) : ''}
-            </Text>
-            <Image source={images.chevronRight} style={styles.chevronIcon} />
-          </View>
-        </TouchableOpacity>
+        <Text style={styles.balanceText}>Available Points: {totalPoints}</Text>
       </View>
 
       <View style={styles.centerSection}>
@@ -62,7 +71,20 @@ const BonusWheelHeader = ({ username }) => {
       </View>
 
       <View style={styles.rightSection}>
-        <Text style={styles.balanceText}>Available Points: {totalPoints}</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <View style={styles.userContainer}>
+            <Image source={images.profileLogo} style={styles.userIcon} />
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.username}>
+                {username ? username.charAt(0).toUpperCase() + username.slice(1) : ''}
+              </Text>
+              <Text style={[styles.verificationStatus, verified ? styles.verifiedText : styles.notVerifiedText]}>
+                {verified ? 'Verified' : 'Not Verified'}
+              </Text>
+            </View>
+            <Image source={images.chevronRight} style={styles.chevronIcon} />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -106,11 +128,24 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
+  userInfoContainer: {
+    flexDirection: 'column',
+    marginLeft: 10,
+  },
   username: {
     fontSize: 14,
     color: '#FFFFFF',
-    marginLeft: 10,
     fontWeight: '600',
+  },
+  verificationStatus: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  verifiedText: {
+    color: '#4ADE80', // Green color for verified
+  },
+  notVerifiedText: {
+    color: '#FF4A4A', // Red color for not verified
   },
   chevronIcon: {
     width: 10,

@@ -1,21 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, Image, KeyboardAvoidingView, Platform} from 'react-native';
-import { NavigationContainer, useNavigation, DrawerActions } from '@react-navigation/native';
-import { createDrawerNavigator, DrawerContentComponentProps, useDrawerStatus } from '@react-navigation/drawer';
-import { Feather } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, Platform, Keyboard, Animated } from 'react-native';
+import { DrawerContentComponentProps, useDrawerStatus } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TapGestureHandler } from 'react-native-gesture-handler';
-import { LinearGradient } from 'expo-linear-gradient';
 
-
-const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get('window');
-
-const getRandomInt = (min: number, max: number) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
 
 const clearAuthData = async () => {
   try {
@@ -66,7 +55,8 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
   const [tapCount, setTapCount] = useState(0);
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const [activeButton, setActiveButton] = useState<string | null>(null);
-  
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const keyboardVisibleAnim = useRef(new Animated.Value(0)).current;
 
   const checkCustomerToken = async () => {
     const customerToken = await AsyncStorage.getItem('customerToken');
@@ -119,68 +109,109 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
     </TouchableOpacity>
   );
 
-
   const handlePress = (screen: keyof DrawerScreens, label: string) => {
     setActiveButton(label);
     navigation.navigate(screen, { title: screen });
   };
-
-  const dynamicGap = (customerToken || valetToken) ? 20 : 40; 
-
-  const handleLogout = async () => {
-    await deleteCustomerToken();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'SignIn' }],
-    });
+  
+  const navigateToHome = () => {
+    setActiveButton(null); // Reset the active button when going to Home
+    navigation.navigate('Home');
   };
 
+  // Handle exit button press - clear tokens and navigate to Home
+  const handleExitPress = async () => {
+    await deleteCustomerToken();
+    setActiveButton(null); // Reset the active button
+    // navigation.navigate('HomeScreen'); // Navigate to HomeScreen after logout
+  };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      Animated.timing(keyboardVisibleAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true
+      }).start();
+      setKeyboardVisible(true);
+    });
+    
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      Animated.timing(keyboardVisibleAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true
+      }).start();
+      setKeyboardVisible(false);
+    });
+  
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
     <TapGestureHandler onActivated={handleTripleTap} numberOfTaps={1}>
-        
-      <View style={[styles.drawerContent, { gap: dynamicGap }]}>
-        
-        <NavButton
-          icon={require('../assets/order.png')}
-          label="Order"
-          isActive={activeButton === 'Order'}
-          onPress={() => handlePress('OrderScreen', 'Order')}
-        />
-        <NavButton
-          icon={require('../assets/survey.png')}
-          label="Survey"
-          isActive={activeButton === 'Survey'}
-          onPress={() => handlePress('SurveyScreen', 'Survey')}
-        />
-        
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <View style={styles.headerContainer}>
-            <Image 
-              source={require('../assets/output-onlinepngtools (3) 1.png')} 
-              style={styles.logo} 
-            />
-          </View>
-        </TouchableOpacity>
-        <NavButton
-          icon={require('../assets/bonus.png')}
-          label="Bonus"
-          isActive={activeButton === 'Bonus'}
-          onPress={() => handlePress('BonusScreen', 'Bonus')}
-        />
-        <NavButton
-          icon={require('../assets/contactus.png')}
-          label="Contact"
-          isActive={activeButton === 'Contact'}
-          onPress={() => handlePress('ContactUsScreen', 'Contact')}
-        />
-         {(customerToken || valetToken) && (
+      <Animated.View 
+        style={[
+          styles.drawerContent,
+          {
+            opacity: keyboardVisibleAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 0]
+            }),
+            transform: [{
+              translateY: keyboardVisibleAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 100]
+              })
+            }]
+          }
+        ]}
+      >
+        <View style={styles.navContainer}>
+          <NavButton
+            icon={require('../assets/order.png')}
+            label="Order"
+            isActive={activeButton === 'Order'}
+            onPress={() => handlePress('OrderScreen', 'Order')}
+          />
+          
+          <NavButton
+            icon={require('../assets/survey.png')}
+            label="Survey"
+            isActive={activeButton === 'Survey'}
+            onPress={() => handlePress('SurveyScreen', 'Survey')}
+          />
+          
+          <TouchableOpacity onPress={navigateToHome} style={styles.logoContainer}>
+            <View style={styles.headerContainer}>
+              <Image 
+                source={require('../assets/newlogo.png')} 
+                style={styles.logo} 
+              />
+            </View>
+          </TouchableOpacity>
+          
+          <NavButton
+            icon={require('../assets/bonus.png')}
+            label="Bonus"
+            isActive={activeButton === 'Bonus'}
+            onPress={() => handlePress('BonusScreen', 'Bonus')}
+          />
+          
+          <NavButton
+            icon={require('../assets/contactus.png')}
+            label="Contact"
+            isActive={activeButton === 'Contact'}
+            onPress={() => handlePress('ContactUsScreen', 'Contact')}
+          />
+          
+          {(customerToken || valetToken) && (
             <TouchableOpacity
               style={styles.drawerItem}
-              onPress={deleteCustomerToken}
+              onPress={handleExitPress}
             >
               <View style={styles.iconTextContainer}>
                 <Image
@@ -191,31 +222,41 @@ const CustomDrawerContent = ({ navigation }: DrawerContentComponentProps) => {
             </TouchableOpacity>
           )}
         </View>
-      </TapGestureHandler>
-    </KeyboardAvoidingView>
+      </Animated.View>
+    </TapGestureHandler>
   );
 };
-
 
 const styles = StyleSheet.create({
   drawerContent: {
     position: 'absolute',
     bottom: 0,
     height: 80,
-    flexDirection: 'row',
-    width: '190%',
-    paddingHorizontal: 30,
-    backgroundColor: '#001E3D', 
-    alignItems: 'center',
+    // width: '300%',
+    width: width *1.1,
     justifyContent: 'center',
-    gap: 40,
+    alignItems: 'center',
+    right: '-195%',
+    // marginLeft: '90%',
+    backgroundColor: '#001E3D',
+  },
+  navContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    paddingHorizontal: 10,
   },
   headerContainer: {
     height: 60,
     width: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 45, 
+    borderRadius: 45,
+  },
+  logoContainer: {
+    alignItems: 'center',
   },
   activeButton: {
     backgroundColor: '#3F63CB33',
@@ -223,12 +264,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 20,
-
   },
   logo: {
     width: 50,
     height: 50,
-    // marginBottom: 5,
   },
   drawerHeaderText: {
     color: '#fff',
@@ -237,17 +276,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textTransform: 'uppercase',
     paddingVertical: 18,
-    marginBottom: 8,//Johnny sadaka svg
-    borderRadius: 15,  // Increased border radius for rounded corners
+    marginBottom: 8,
+    borderRadius: 15,
     letterSpacing: 2,
   },
   drawerItem: {
-    marginRight: 10,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    marginVertical: 5,
     shadowColor: '#000',
-   shadowOffset: {
+    shadowOffset: {
       width: 0,
       height: 3,
     },

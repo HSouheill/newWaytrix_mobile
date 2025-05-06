@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text,Dimensions, StyleSheet, Alert, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Alert, TouchableOpacity, Modal, Pressable } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GetRestoId from './GetRestoId';
@@ -9,9 +9,11 @@ const GetCars = () => {
   const [cars, setCars] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  // deleteSet
-  const [countdownSet, setCountdownSet] = useState(false); // State to track countdown set status
+  // Modal states
+  const [countdownSet, setCountdownSet] = useState(false);
   const [deleteSet, setDeleteSet] = useState(false);
+  const [alreadySetModal, setAlreadySetModal] = useState(false); // New state for already set countdown modal
+
   useEffect(() => {
     fetchData(); // Initial fetch
     const interval = setInterval(fetchData, 5000); // Fetch data every 5 seconds
@@ -39,7 +41,6 @@ const GetCars = () => {
     }
   };
   
-
   const handleDelete = async (_id) => {
     setDeleteId(_id);
     setShowModal(true);
@@ -59,14 +60,12 @@ const GetCars = () => {
       setTimeout(() => {
         setDeleteSet(false);
       }, 1500);
-      // Alert.alert('Success', 'Car deleted successfully');
     } catch (error) {
       console.error('Error deleting car:', error);
       Alert.alert('Error', 'Failed to delete car');
     }
   };
   
-
   const logNumber = async (number, _id) => {
     try {
       // Fetch valetToken from AsyncStorage
@@ -83,20 +82,39 @@ const GetCars = () => {
         timeNum: number
       }, { headers });
   
-      console.log(response.data); // Log response data
-      setCountdownSet(true); // Set countdown set status to true
-  
-      // Implement modal or UI update as per your design
-  
-      setTimeout(() => {
-        setCountdownSet(false);
-      }, 2000);
+      console.log(response.data);
+      
+      // Check the response status or a specific flag in the response
+      if (response.data.alreadySet) {
+        // Show the "already set" modal
+        setAlreadySetModal(true);
+        
+        setTimeout(() => {
+          setAlreadySetModal(false);
+        }, 2000);
+      } else {
+        // Show success modal
+        setCountdownSet(true);
+      
+        setTimeout(() => {
+          setCountdownSet(false);
+        }, 2000);
+      }
     } catch (error) {
       console.error('Error setting countdown:', error);
-      Alert.alert('Error', 'Failed to set countdown');
+      
+      // Check if the error response contains info about already set countdown
+      if (error.response && error.response.data && error.response.data.alreadySet) {
+        setAlreadySetModal(true);
+        
+        setTimeout(() => {
+          setAlreadySetModal(false);
+        }, 2000);
+      } else {
+        Alert.alert('Error', 'Failed to set countdown');
+      }
     }
   };
-  
 
   const closeModal = () => {
     setShowModal(false);
@@ -125,6 +143,7 @@ const GetCars = () => {
         </View>
       ))}
 
+      {/* Delete confirmation modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -146,7 +165,7 @@ const GetCars = () => {
         </View>
       </Modal>
       
-      {/* Complex dark theme modal */}
+      {/* Countdown set success modal */}
       {countdownSet && (
         <Modal
           animationType="fade"
@@ -162,7 +181,24 @@ const GetCars = () => {
         </Modal>
       )}
 
-{deleteSet && (
+      {/* Already set countdown modal - NEW */}
+      {alreadySetModal && (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={alreadySetModal}
+          onRequestClose={() => setAlreadySetModal(false)}
+        >
+          <View style={styles.darkThemeModalBackground}>
+            <View style={styles.darkThemeModalContent}>
+              <Text style={styles.darkThemeModalText}>Could not take time, already placed.</Text>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Delete success modal */}
+      {deleteSet && (
         <Modal
           animationType="fade"
           transparent={true}
@@ -285,15 +321,16 @@ const styles = StyleSheet.create({
   },
   modalDeleteButtonText: {
     color: '#FFFFFF',
-  }, darkThemeModalBackground: {
+  }, 
+  darkThemeModalBackground: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   darkThemeModalContent: {
-    borderWidth:2,
-    borderColor:'white',
+    borderWidth: 2,
+    borderColor: 'white',
     backgroundColor: 'black',
     padding: 20,
     borderRadius: 10,

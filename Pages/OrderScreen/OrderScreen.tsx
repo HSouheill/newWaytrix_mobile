@@ -150,7 +150,7 @@ export default function SettingsScreen({ navigation }) {
       <View style={styles.container}>
         <View style={styles.content}>
         {/* <CustomHeader /> */}
-          <Image source={require('../../assets/logo1.png')} style={styles.logo}/>
+          <Image source={require('../../assets/newlogo_waytrix.png')} style={styles.logo}/>
           
           <View style={styles.bigButtonContainer}>
             <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate('MenuScreen')}>
@@ -163,9 +163,15 @@ export default function SettingsScreen({ navigation }) {
             </TouchableOpacity>
           </View>
   
-  
-          <ScrollView contentContainerStyle={styles.buttonContainer}>
+
+
+          <View style={styles.scrollableContainer}>
           <Text style={styles.label}>Others</Text>
+
+          <ScrollView contentContainerStyle={styles.buttonContainer}
+           style={styles.scrollView}
+           showsVerticalScrollIndicator={true}>
+            <TouchableWithoutFeedback>
             <View style={styles.buttonRow}>
               {bill && (
                 <View style={styles.buttonColumn}>
@@ -251,8 +257,9 @@ export default function SettingsScreen({ navigation }) {
                 </View>
               ))}
             </View>
+            </TouchableWithoutFeedback>
           </ScrollView>
-  
+            </View>
            <Modal
                   animationType="fade"
                   transparent={true}
@@ -284,22 +291,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    top: 20,
+    top: '1%',
   },
   logo: {
-    width: 90,
+    width: 300,
     height: 90,
-    marginBottom: 20,
-    top: -10,
+    alignSelf: 'center',
+    resizeMode: 'contain',
    },
   image: {
     width: 100,
     height: 100,
   },
-  buttonContainer: {
+  scrollableContainer: {
+    flex: 1, // Take up remaining space
     width: '100%',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  scrollView: {
+    width: '100%',
+    flex: 1,
+  },
+  buttonContainer: {
     paddingHorizontal: 10,
-    top: 40,
+    paddingBottom: 40, // Add padding at the bottom for better scrolling
   },
   buttonColumn: {
     alignItems: 'center',

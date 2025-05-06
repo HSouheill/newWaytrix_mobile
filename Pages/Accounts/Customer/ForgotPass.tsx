@@ -69,7 +69,8 @@ const ForgotPass = () => {
   return (
         <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
     <View style={styles.container}>
-      <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
+      <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image}/>
+      <View style={styles.content}>
       <Text style={styles.title}>Reset Password</Text>
       <Image source={require('../../../assets/forgot-password 2.png')} style={styles.image1}/>
       <Text style={styles.description}>Enter the email address associated with your account.</Text>
@@ -95,6 +96,7 @@ const ForgotPass = () => {
                 </LinearGradient>
               </TouchableOpacity>
     </View>
+    </View>
     </ImageBackground>
   );
 };
@@ -114,11 +116,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: '-10%',
   },
+  content:{
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    top: '5%',
+ 
+  },
   image: {
-    width: 90,
+    width: 300,
     height: 90,
-    marginBottom: 20,
     alignSelf: 'center',
+    resizeMode: 'contain',
   },
   image1: {
     width: 150,

@@ -12,8 +12,8 @@ const Login = () => {
   return (
     <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
     <View style={styles.container}>
-    <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
-      <StatusBar barStyle="light-content" backgroundColor="#000066" />
+    <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image}/>
+      <StatusBar  barStyle="light-content" backgroundColor="#000066"  />
       <Text style={styles.title}>Your Prize is</Text>
       <Text style={styles.title}>"JUST"</Text>
       <Text style={styles.title}>a Login Away</Text>
@@ -51,16 +51,17 @@ const styles = StyleSheet.create({
     top: '-15%',
   },
   image: {
-    width: 170,
-    height: 170,
+    // width: 170,
+    height: 130,
     top: '-7%',
+    resizeMode: 'contain'
   },
   title: {
     color: 'white',
     fontSize: 30,
     fontWeight: 'bold',
     // marginBottom: 20,
-    top: '-5%',
+    top: '-4%',
     textAlign: 'center',
   },
   buttonContainer: {

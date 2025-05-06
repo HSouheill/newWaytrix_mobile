@@ -62,7 +62,7 @@ const ResetPass = () => {
     <ImageBackground source={require('../../../assets/background.png')} style={styles.backgroundContainer}>
 
       <View style={styles.container}>
-        <Image source={require('../../../assets/logo1.png')} style={styles.image}/>
+        <Image source={require('../../../assets/newlogo_waytrix.png')} style={styles.image}/>
         <Text style={styles.title}>Reset Password</Text>
         <Image source={require('../../../assets/forgot-password 1.png')} style={styles.image1}/>
         <Text style={styles.description}>
@@ -121,10 +121,10 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 90,
+    width: 300,
     height: 90,
-    marginBottom: 20,
     alignSelf: 'center',
+    resizeMode: 'contain',
   },
 
   image1: {
